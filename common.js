@@ -42,7 +42,10 @@
     ];
 
     // 위키 소개글 번역이 있는 유형 (PG+ guide/data/pages/<유형>.json). 없는 유형은 요청하지 않는다.
-    var TYPE_PAGES = ["traveller", "fabled"];
+    var TYPE_PAGES = ["traveller", "fabled", "loric"];
+
+    // 위키 Loric 문서의 순서. 여기에 없는 새 설화는 맨 뒤(가나다순)로 간다.
+    var LORIC_ORDER = ["bigwig", "bootlegger", "gardener", "godofug", "hindu", "knaves", "pope", "stormcatcher", "tor", "ventriloquist", "zenomancer"];
 
     // 위키 Fabled 문서의 묶음과 묶음 안 순서. 여기에 없는 새 전설은 맨 뒤 "기타"(가나다순)로 모인다.
     var FABLED_GROUPS = [
@@ -100,7 +103,7 @@
     //  - 주민·외지인·하수인·악마: 가나다순, 초성 머리글자로 묶음
     //  - 여행자: 위키 순서 (점철되는 혼란 → 화단에 꽃피운 이단 → 피로 물든 달 → 실험, 묶음 안도 위키 순서)
     //  - 전설: 위키 묶음 (사회적 상호작용 & 접근성 / 커스텀 스크립트 / 실험), 묶음 안도 위키 순서
-    //  - 설화: 가나다순 한 묶음
+    //  - 설화: 위키 순서 한 묶음
     function typeSections(catalog, team) {
         var members = catalog.filter(function (entry) {
             return entry.team === team;
@@ -150,7 +153,13 @@
         }
 
         if (team === "loric") {
-            return [{ title: "", entries: members }];
+            return [{ title: "", entries: members.slice().sort(function (a, b) {
+                var ia = LORIC_ORDER.indexOf(a.id);
+                var ib = LORIC_ORDER.indexOf(b.id);
+                ia = ia === -1 ? LORIC_ORDER.length : ia;
+                ib = ib === -1 ? LORIC_ORDER.length : ib;
+                return ia - ib || byName(a, b);
+            }) }];
         }
 
         members.forEach(function (entry) {
@@ -204,9 +213,9 @@
         return "character.html?id=" + encodeURIComponent(id);
     }
 
-    // 이름 색: 선 파랑 / 악 빨강 / 여행자 보라 / 전설 금색 (위키와 같게)
+    // 이름 색: 선 파랑 / 악 빨강 / 여행자 보라 / 전설 금색 / 설화 초록 (위키와 같게)
     function side(team) {
-        if (team === "traveller" || team === "fabled") {
+        if (team === "traveller" || team === "fabled" || team === "loric") {
             return team;
         }
         return (team === "minion" || team === "demon") ? "evil" : "good";

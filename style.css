@@ -62,6 +62,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 .role--evil { color: var(--evil); }
 .role--traveller { color: #7d2182; }
 .role--fabled { color: #c9971c; }
+.role--loric { color: #3f8a36; }
 .credit {
     margin-top: 2.5em;
     padding-top: 1em;
