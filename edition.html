@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
 /* 판 페이지 — 공식 위키 판 문서 구조: 판 로고 → 유형별 이름 표 → 유형별 아이콘 격자.
-   줄거리·게임 방식 글은 아직 번역하지 않았다. 여행자는 위키와 같이 판 페이지에 넣지 않는다(여행자 유형 페이지에 판별로 있음). */
+   줄거리·게임 방식은 PG+ guide/data/pages/<판>.json 번역을 표 뒤에 넣는다(위키와 같은 순서). 여행자는 위키와 같이 판 페이지에 넣지 않는다(여행자 유형 페이지에 판별로 있음). */
 .edition-logo { display: block; width: 200px; height: 200px; margin: 0.5em auto; object-fit: contain; }
 .edition-table {
     width: 100%;
@@ -26,6 +26,8 @@
 .edition-table tr:nth-child(odd) { background: #fff; }
 .edition-table tr:nth-child(even) { background: #f7f5f2; }
 .edition-table a { font-weight: bold; text-decoration: none; }
+.story p { color: #222; font-size: 15.5px; }
+.story--synopsis p { font-family: "Gowun Batang", serif; font-style: italic; }
 </style>
 </head>
 <body>
@@ -49,7 +51,7 @@
         }
     });
 
-    function render(catalog) {
+    function render(catalog, story) {
         var sections = W.editionSections(catalog, edition.id);
         var html = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>";
 
@@ -63,8 +65,24 @@
             }).join(" · ") + "</td></tr>";
         }).join("") + "</table>";
 
+        if (story) {
+            var byId = W.indexById(catalog);
+            story.sections.forEach(function (section) {
+                html += "<section class=\"story story--" + esc(section.key) + "\"><h2>" + esc(section.title) + "</h2>" +
+                    section.blocks.map(function (block) {
+                        return "<p>" + W.richText(block.p || "", byId) + "</p>";
+                    }).join("") + "</section>";
+            });
+        }
+
         html += W.sectionsHtml(sections);
-        html += W.CREDIT;
+        if (story) {
+            html += "<div class=\"credit\">이 페이지의 줄거리·게임 방식은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
+                ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
+                "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(story.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
+        } else {
+            html += W.CREDIT;
+        }
         page.innerHTML = html;
     }
 
@@ -73,8 +91,14 @@
         return;
     }
 
-    W.getJSON("guide/data/catalog.json")
-        .then(render)
+    // 판 문서 번역이 없거나 못 읽어도 목록은 보여 준다.
+    Promise.all([
+        W.getJSON("guide/data/catalog.json"),
+        W.getJSON("guide/data/pages/" + edition.id + ".json").catch(function () { return null; })
+    ])
+        .then(function (data) {
+            render(data[0], data[1]);
+        })
         .catch(function () {
             page.innerHTML = W.notFoundHtml("목록을 불러오지 못했습니다", "잠시 뒤 다시 열어 주세요.") + W.CREDIT;
         });

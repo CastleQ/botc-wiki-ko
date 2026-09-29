@@ -196,6 +196,28 @@
         }).join("") + "</ul>";
     }
 
+    // 번역문 표기: {c:id} → 캐릭터 링크(선 파랑 / 악 빨강, 정발 이름), **굵게** → 굵은 글씨.
+    // byId는 catalog를 id로 찾을 수 있게 만든 표. 목록에 없는 id는 글자 그대로 둔다.
+    function richText(text, byId) {
+        return esc(text)
+            .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+            .replace(/\{c:([a-z_]+)\}/g, function (all, roleId) {
+                var entry = byId[roleId];
+                if (!entry) {
+                    return esc(roleId);
+                }
+                return "<a class=\"role role--" + side(entry.team) + "\" href=\"" + pageUrl(entry.id) + "\">" + esc(entry.name) + "</a>";
+            });
+    }
+
+    function indexById(catalog) {
+        var byId = {};
+        catalog.forEach(function (entry) {
+            byId[entry.id] = entry;
+        });
+        return byId;
+    }
+
     function sectionsHtml(sections) {
         return sections.map(function (section) {
             return (section.title ? "<h2>" + esc(section.title) + "</h2>" : "") + grid(section.entries);
@@ -224,6 +246,8 @@
         side: side,
         grid: grid,
         sectionsHtml: sectionsHtml,
+        richText: richText,
+        indexById: indexById,
         editionSections: editionSections,
         typeSections: typeSections,
         homeOf: homeOf,
