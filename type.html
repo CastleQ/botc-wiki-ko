@@ -41,14 +41,26 @@
         html += "<h1 class=\"title\">" + esc(name) + "</h1>";
         if (story) {
             var byId = W.indexById(catalog);
-            html += "<div class=\"wiki-text\">" + story.sections.map(function (section) {
+            var paragraphs = function (section) {
                 return section.blocks.map(function (block) {
                     return "<p>" + W.richText(block.p || "", byId) + "</p>";
                 }).join("");
-            }).join("") + "</div>";
-            html += "<nav id=\"toc\"><div class=\"toctitle\">목차</div><ol>" + sections.map(function (section, index) {
-                return "<li><a href=\"#group-" + index + "\"><span class=\"tocnumber\">" + (index + 1) + "</span>" + esc(section.title) + "</a></li>";
+            };
+            // 제목 없는 구역(소개글)은 목차 앞, 제목 있는 구역(진행 방법 등)은 목차 뒤 — 위키와 같은 순서
+            var lead = story.sections.filter(function (section) { return !section.title; });
+            var titled = story.sections.filter(function (section) { return section.title; });
+            var toc = titled.map(function (section) {
+                return { anchor: section.key, title: section.title };
+            }).concat(sections.map(function (section, index) {
+                return { anchor: "group-" + index, title: section.title };
+            }));
+            html += "<div class=\"wiki-text\">" + lead.map(paragraphs).join("") + "</div>";
+            html += "<nav id=\"toc\"><div class=\"toctitle\">목차</div><ol>" + toc.map(function (item, n) {
+                return "<li><a href=\"#" + item.anchor + "\"><span class=\"tocnumber\">" + (n + 1) + "</span>" + esc(item.title) + "</a></li>";
             }).join("") + "</ol></nav>";
+            html += titled.map(function (section) {
+                return "<section class=\"wiki-text\"><h2 id=\"" + esc(section.key) + "\">" + esc(section.title) + "</h2>" + paragraphs(section) + "</section>";
+            }).join("");
         } else {
             html += "<p class=\"lead\">" + esc(name) + " 캐릭터 " + count + "개</p>";
         }
@@ -56,7 +68,7 @@
             return (section.title ? "<h2 id=\"group-" + index + "\">" + esc(section.title) + "</h2>" : "") + W.grid(section.entries);
         }).join("");
         if (story) {
-            html += "<div class=\"credit\">이 페이지의 소개글은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
+            html += "<div class=\"credit\">이 페이지의 설명글은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
                 ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
                 "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(story.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
         } else {
