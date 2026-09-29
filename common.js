@@ -11,10 +11,10 @@
     var EDITIONS = [
         { id: "tb", name: "점철되는 혼란", alt: "Trouble Brewing", logo: BASE + "guide/img/logo_tb.webp" },
         { id: "bmr", name: "피로 물든 달", alt: "Bad Moon Rising", logo: BASE + "guide/img/logo_bmr.webp" },
-        { id: "snv", name: "화단에 꽃 피운 이단", alt: "Sects & Violets", logo: BASE + "guide/img/logo_snv.webp" }
+        { id: "snv", name: "화단에 꽃피운 이단", alt: "Sects & Violets", logo: BASE + "guide/img/logo_snv.webp" }
     ];
     // 판 이름은 PG+ 앱의 정발 이름을 따른다 (translations/messages.ko_KR.yaml editions).
-    var EDITION_NAMES = { tb: "점철되는 혼란", bmr: "피로 물든 달", snv: "화단에 꽃 피운 이단", exp: "실험" };
+    var EDITION_NAMES = { tb: "점철되는 혼란", bmr: "피로 물든 달", snv: "화단에 꽃피운 이단", exp: "실험" };
 
     // 공식 위키 메인의 "Characters By Type"
     var TYPES = [
@@ -87,7 +87,7 @@
 
     // 유형 페이지 묶음
     //  - 주민·외지인·하수인·악마: 가나다순, 초성 머리글자로 묶음
-    //  - 여행자: 판별 (점철되는 혼란 → 피로 물든 달 → 화단에 꽃 피운 이단 → 실험)
+    //  - 여행자: 판별 (점철되는 혼란 → 피로 물든 달 → 화단에 꽃피운 이단 → 실험)
     //  - 전설: 위키 묶음 (사회적 상호작용 & 접근성 / 커스텀 스크립트 / 실험), 묶음 안은 가나다순
     //  - 설화: 가나다순 한 묶음
     function typeSections(catalog, team) {
