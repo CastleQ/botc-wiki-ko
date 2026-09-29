@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>포켓 그리모어 캐릭터 도감</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;700&family=Gowun+Batang&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* 판 페이지 — 공식 위키 판 문서 구조: 판 로고 → 유형별 이름 표 → 유형별 아이콘 격자.
+   줄거리·게임 방식 글은 아직 번역하지 않았다. 여행자는 위키와 같이 판 페이지에 넣지 않는다(여행자 유형 페이지에 판별로 있음). */
+.edition-logo { display: block; width: 200px; height: 200px; margin: 0.5em auto; object-fit: contain; }
+.edition-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--wiki-border);
+    font-size: 14.5px;
+    color: #222;
+}
+.edition-table th, .edition-table td { padding: 0.55em 0.6em; text-align: left; vertical-align: top; }
+.edition-table th { width: 5em; font-weight: normal; color: #000; white-space: nowrap; }
+.edition-table tr:nth-child(odd) { background: #fff; }
+.edition-table tr:nth-child(even) { background: #f7f5f2; }
+.edition-table a { font-weight: bold; text-decoration: none; }
+</style>
+</head>
+<body>
+<nav class="tab-bar">
+    <a href="./">포켓 그리모어 캐릭터 도감 <small>(비공식 한국어 번역)</small></a>
+</nav>
+<main class="page" id="page"></main>
+
+<script src="common.js"></script>
+<script>
+(function () {
+
+    var W = window.WikiKo;
+    var esc = W.esc;
+    var page = document.getElementById("page");
+    var id = new URLSearchParams(window.location.search).get("id") || "";
+    var edition = null;
+    W.EDITIONS.forEach(function (item) {
+        if (item.id === id) {
+            edition = item;
+        }
+    });
+
+    function render(catalog) {
+        var sections = W.editionSections(catalog, edition.id);
+        var html = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>";
+
+        document.title = edition.name + " — 포켓 그리모어 캐릭터 도감";
+        html += "<h1 class=\"title\">" + esc(edition.name) + "</h1>";
+        html += "<img class=\"edition-logo\" src=\"" + edition.logo + "\" alt=\"" + esc(edition.alt) + "\">";
+
+        html += "<table class=\"edition-table\">" + sections.map(function (section) {
+            return "<tr><th>" + esc(section.title) + "</th><td>" + section.entries.map(function (entry) {
+                return "<a class=\"role--" + W.side(entry.team) + "\" href=\"" + W.pageUrl(entry.id) + "\">" + esc(entry.name) + "</a>";
+            }).join(" · ") + "</td></tr>";
+        }).join("") + "</table>";
+
+        html += W.sectionsHtml(sections);
+        html += W.CREDIT;
+        page.innerHTML = html;
+    }
+
+    if (!edition) {
+        page.innerHTML = W.notFoundHtml("없는 에디션", "메인에서 에디션을 다시 골라 주세요.") + W.CREDIT;
+        return;
+    }
+
+    W.getJSON("guide/data/catalog.json")
+        .then(render)
+        .catch(function () {
+            page.innerHTML = W.notFoundHtml("목록을 불러오지 못했습니다", "잠시 뒤 다시 열어 주세요.") + W.CREDIT;
+        });
+
+}());
+</script>
+</body>
+</html>

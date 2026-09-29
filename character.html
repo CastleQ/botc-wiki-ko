@@ -12,18 +12,6 @@
 <style>
 /* 캐릭터 페이지 — 포켓 그리모어 플러스+의 public/guide.html을 복사해 고친 것.
    도감에는 가림막이 없고, 데이터는 PG+ 배포본(/pocket-grimoire/guide/data/)을 읽는다. */
-.char-nav {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px 12px;
-    font-size: 14px;
-    margin-bottom: 0.5em;
-}
-.char-nav a { color: var(--wiki-maroon); text-decoration: none; font-weight: bold; }
-.char-nav__steps { display: flex; gap: 12px; margin-left: auto; }
-.char-nav__steps a { font-weight: normal; }
 #tagline {
     font-family: "Gowun Batang", serif;
     font-style: italic;
@@ -113,11 +101,10 @@ audio { width: 90%; margin: 0.5em 0 10px; }
     var esc = W.esc;
 
     // 판 로고 (PG+ 배포본의 guide/img/). 실험 캐릭터(exp)는 로고가 없다.
-    var EDITIONS = {
-        tb: { alt: "Trouble Brewing", logo: W.BASE + "guide/img/logo_tb.webp" },
-        bmr: { alt: "Bad Moon Rising", logo: W.BASE + "guide/img/logo_bmr.webp" },
-        snv: { alt: "Sects & Violets", logo: W.BASE + "guide/img/logo_snv.webp" }
-    };
+    var EDITIONS = {};
+    W.EDITIONS.forEach(function (edition) {
+        EDITIONS[edition.id] = edition;
+    });
 
     var params = new URLSearchParams(window.location.search);
     var id = (params.get("id") || "").replace(/[^a-z_]/g, "");
@@ -165,32 +152,32 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         return "";
     }
 
-    // 위쪽 이동 막대: 메인으로 + 같은 묶음(판, 또는 전설·설화) 안의 이전/다음 캐릭터
+    // 위쪽 이동 막대: 메인으로 · 돌아갈 페이지 + 이전/다음 캐릭터.
+    // 3개 판의 주민·외지인·하수인·악마는 판 페이지 순서, 나머지(실험·여행자·전설·설화)는 유형 페이지 순서 (common.js homeOf).
     function navBar() {
-        var html = "<nav class=\"char-nav\"><a href=\"./\">← 메인으로</a>";
+        var html = "<nav class=\"crumbs\"><span><a href=\"./\">← 메인으로</a>";
         var here = null;
         catalog.forEach(function (entry) {
             if (entry.id === id) {
                 here = entry;
             }
         });
-        if (here) {
-            var group = catalog.filter(function (entry) {
-                return W.groupOf(entry) === W.groupOf(here);
-            });
-            var index = group.indexOf(here);
-            var prev = group[index - 1];
-            var next = group[index + 1];
-            html += "<span class=\"char-nav__steps\">";
-            if (prev) {
-                html += "<a href=\"" + W.pageUrl(prev.id) + "\">‹ " + esc(prev.name) + "</a>";
-            }
-            if (next) {
-                html += "<a href=\"" + W.pageUrl(next.id) + "\">" + esc(next.name) + " ›</a>";
-            }
-            html += "</span>";
+        if (!here) {
+            return html + "</span></nav>";
         }
-        return html + "</nav>";
+        var home = W.homeOf(catalog, here);
+        var index = home.order.indexOf(here);
+        var prev = home.order[index - 1];
+        var next = home.order[index + 1];
+        html += " · <a href=\"" + home.href + "\">" + esc(home.title) + "</a></span>";
+        html += "<span class=\"crumbs__steps\">";
+        if (prev) {
+            html += "<a href=\"" + W.pageUrl(prev.id) + "\">‹ " + esc(prev.name) + "</a>";
+        }
+        if (next) {
+            html += "<a href=\"" + W.pageUrl(next.id) + "\">" + esc(next.name) + " ›</a>";
+        }
+        return html + "</span></nav>";
     }
 
     function render(guide) {
@@ -261,7 +248,7 @@ audio { width: 90%; margin: 0.5em 0 10px; }
     }
 
     function notFound() {
-        page.innerHTML = "<nav class=\"char-nav\"><a href=\"./\">← 메인으로</a></nav>" +
+        page.innerHTML = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>" +
             "<div class=\"notfound\"><h2>번역 준비 중</h2><p>이 캐릭터의 가이드는 아직 번역 중입니다.</p></div>";
     }
 

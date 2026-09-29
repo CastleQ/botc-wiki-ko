@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>포켓 그리모어 캐릭터 도감</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;700&family=Gowun+Batang&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="tab-bar">
+    <a href="./">포켓 그리모어 캐릭터 도감 <small>(비공식 한국어 번역)</small></a>
+</nav>
+<main class="page" id="page"></main>
+
+<script src="common.js"></script>
+<script>
+// 유형 페이지 — 공식 위키의 분류(주민·외지인·하수인·악마)와 여행자·전설·설화 문서.
+// 위키는 이름만 나열하지만 도감은 아이콘과 이름을 함께 보여 준다. 묶는 방법은 common.js의 typeSections.
+(function () {
+
+    var W = window.WikiKo;
+    var esc = W.esc;
+    var page = document.getElementById("page");
+    var id = new URLSearchParams(window.location.search).get("id") || "";
+    var name = Object.prototype.hasOwnProperty.call(W.TEAM_NAMES, id) ? W.TEAM_NAMES[id] : "";
+
+    function render(catalog) {
+        var sections = W.typeSections(catalog, id);
+        var count = sections.reduce(function (sum, section) {
+            return sum + section.entries.length;
+        }, 0);
+        var html = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>";
+
+        document.title = name + " — 포켓 그리모어 캐릭터 도감";
+        html += "<h1 class=\"title\">" + esc(name) + "</h1>";
+        html += "<p class=\"lead\">" + esc(name) + " 캐릭터 " + count + "개</p>";
+        html += W.sectionsHtml(sections);
+        html += W.CREDIT;
+        page.innerHTML = html;
+    }
+
+    if (!name) {
+        page.innerHTML = W.notFoundHtml("없는 유형", "메인에서 유형을 다시 골라 주세요.") + W.CREDIT;
+        return;
+    }
+
+    W.getJSON("guide/data/catalog.json")
+        .then(render)
+        .catch(function () {
+            page.innerHTML = W.notFoundHtml("목록을 불러오지 못했습니다", "잠시 뒤 다시 열어 주세요.") + W.CREDIT;
+        });
+
+}());
+</script>
+</body>
+</html>

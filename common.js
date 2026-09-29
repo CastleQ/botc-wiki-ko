@@ -1,10 +1,43 @@
-// 포켓 그리모어 캐릭터 도감 — 두 페이지가 함께 쓰는 설정과 도구.
+// 포켓 그리모어 캐릭터 도감 — 모든 페이지가 함께 쓰는 설정과 도구.
 // 번역 데이터·아이콘·장식 이미지는 이 저장소에 두지 않고, 같은 출처(castleq.github.io)의
 // 포켓 그리모어 플러스+ 배포본을 절대 경로로 읽는다. 번역 수정은 PG+에서만 한다.
+// 목록은 PG+의 guide/data/catalog.json(판 → 유형 → 정발 순번으로 정렬됨)을 쓴다.
 // 브라우저 호환을 위해 async/await 대신 Promise .then()만 쓴다.
 (function () {
 
     var BASE = "/pocket-grimoire/";
+
+    // 공식 위키 메인의 "Characters By Edition". 실험 캐릭터는 판 버튼 없이 유형 페이지로만 들어간다.
+    var EDITIONS = [
+        { id: "tb", name: "트러블 브루잉", alt: "Trouble Brewing", logo: BASE + "guide/img/logo_tb.webp" },
+        { id: "bmr", name: "배드 문 라이징", alt: "Bad Moon Rising", logo: BASE + "guide/img/logo_bmr.webp" },
+        { id: "snv", name: "섹츠 & 바이올렛", alt: "Sects & Violets", logo: BASE + "guide/img/logo_snv.webp" }
+    ];
+    var EDITION_NAMES = { tb: "트러블 브루잉", bmr: "배드 문 라이징", snv: "섹츠 & 바이올렛", exp: "실험" };
+
+    // 공식 위키 메인의 "Characters By Type"
+    var TYPES = [
+        { id: "townsfolk", name: "주민" },
+        { id: "outsider", name: "외지인" },
+        { id: "minion", name: "하수인" },
+        { id: "demon", name: "악마" },
+        { id: "traveller", name: "여행자" },
+        { id: "fabled", name: "전설" },
+        { id: "loric", name: "설화" }
+    ];
+    var TEAM_NAMES = {};
+    TYPES.forEach(function (type) {
+        TEAM_NAMES[type.id] = type.name;
+    });
+    // 판 페이지에 나오는 유형 (위키 판 페이지에는 여행자가 없다)
+    var EDITION_TEAMS = ["townsfolk", "outsider", "minion", "demon"];
+
+    // 위키 Fabled 문서의 묶음. 여기에 없는 새 전설은 맨 뒤 "기타"로 모인다.
+    var FABLED_GROUPS = [
+        { title: "사회적 상호작용 & 접근성", ids: ["angel", "buddhist", "doomsayer", "fiddler", "hellslibrarian", "revolutionary", "toymaker"] },
+        { title: "커스텀 스크립트", ids: ["djinn", "duchess", "fibbin", "sentinel", "spiritofivory"] },
+        { title: "실험", ids: ["deusexfiasco", "ferryman"] }
+    ];
 
     function esc(text) {
         return String(text)
@@ -23,37 +56,178 @@
         });
     }
 
-    // 메인 페이지 묶음. 전설·설화는 판과 상관없이 따로 모은다.
-    var GROUPS = [
-        { key: "tb", title: "트러블 브루잉", logo: "guide/img/logo_tb.webp" },
-        { key: "bmr", title: "배드 문 라이징", logo: "guide/img/logo_bmr.webp" },
-        { key: "snv", title: "섹츠 & 바이올렛", logo: "guide/img/logo_snv.webp" },
-        { key: "exp", title: "실험 캐릭터", logo: "" },
-        { key: "fabled", title: "전설", logo: "" },
-        { key: "loric", title: "설화", logo: "" }
-    ];
+    function byName(a, b) {
+        return a.name.localeCompare(b.name, "ko");
+    }
 
-    function groupOf(entry) {
-        return (entry.team === "fabled" || entry.team === "loric") ? entry.team : entry.edition;
+    // 이름 첫 글자의 초성. 된소리는 예사소리 묶음에 넣는다 (ㄲ → ㄱ).
+    var CHOSEONG = ["ㄱ", "ㄱ", "ㄴ", "ㄷ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅂ", "ㅅ", "ㅅ", "ㅇ", "ㅈ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+    function choseong(name) {
+        var code = name.charCodeAt(0) - 0xAC00;
+        if (code < 0 || code > 11171) {
+            return name.charAt(0).toUpperCase();
+        }
+        return CHOSEONG[Math.floor(code / 588)];
+    }
+
+    // 판 페이지: 주민·외지인·하수인·악마 순, 각 유형 안은 정발 순번(catalog 순서 그대로)
+    function editionSections(catalog, editionId) {
+        return EDITION_TEAMS.map(function (team) {
+            return {
+                title: TEAM_NAMES[team],
+                entries: catalog.filter(function (entry) {
+                    return entry.edition === editionId && entry.team === team;
+                })
+            };
+        }).filter(function (section) {
+            return section.entries.length;
+        });
+    }
+
+    // 유형 페이지 묶음
+    //  - 주민·외지인·하수인·악마: 가나다순, 초성 머리글자로 묶음
+    //  - 여행자: 판별 (트러블 브루잉 → 배드 문 라이징 → 섹츠 & 바이올렛 → 실험)
+    //  - 전설: 위키 묶음 (사회적 상호작용 & 접근성 / 커스텀 스크립트 / 실험), 묶음 안은 가나다순
+    //  - 설화: 가나다순 한 묶음
+    function typeSections(catalog, team) {
+        var members = catalog.filter(function (entry) {
+            return entry.team === team;
+        });
+        var sections = [];
+
+        if (team === "traveller") {
+            ["tb", "bmr", "snv", "exp"].forEach(function (editionId) {
+                var entries = members.filter(function (entry) {
+                    return entry.edition === editionId;
+                });
+                if (entries.length) {
+                    sections.push({ title: EDITION_NAMES[editionId], entries: entries });
+                }
+            });
+            return sections;
+        }
+
+        members = members.slice().sort(byName);
+
+        if (team === "fabled") {
+            var grouped = [];
+            FABLED_GROUPS.forEach(function (group) {
+                var entries = members.filter(function (entry) {
+                    return group.ids.indexOf(entry.id) !== -1;
+                });
+                grouped = grouped.concat(group.ids);
+                if (entries.length) {
+                    sections.push({ title: group.title, entries: entries });
+                }
+            });
+            var rest = members.filter(function (entry) {
+                return grouped.indexOf(entry.id) === -1;
+            });
+            if (rest.length) {
+                sections.push({ title: "기타", entries: rest });
+            }
+            return sections;
+        }
+
+        if (team === "loric") {
+            return [{ title: "", entries: members }];
+        }
+
+        members.forEach(function (entry) {
+            var letter = choseong(entry.name);
+            var last = sections[sections.length - 1];
+            if (!last || last.title !== letter) {
+                last = { title: letter, entries: [] };
+                sections.push(last);
+            }
+            last.entries.push(entry);
+        });
+        return sections;
+    }
+
+    function flatten(sections) {
+        return sections.reduce(function (all, section) {
+            return all.concat(section.entries);
+        }, []);
+    }
+
+    function isEditionMember(entry) {
+        return EDITION_NAMES[entry.edition] && entry.edition !== "exp" && EDITION_TEAMS.indexOf(entry.team) !== -1;
+    }
+
+    // 캐릭터 페이지의 이전/다음 순서와 "돌아갈 페이지".
+    // 3개 판의 주민·외지인·하수인·악마는 판 페이지 순서, 나머지(실험·여행자·전설·설화)는 유형 페이지 순서.
+    // 실험 주민 등은 유형 페이지 순서에서 3개 판 캐릭터를 건너뛴다. 섞으면 판 캐릭터로 넘어간 뒤
+    // 그 캐릭터의 "이전"이 판 페이지 순서를 따르게 되어 앞뒤 이동이 어긋난다.
+    function homeOf(catalog, entry) {
+        if (isEditionMember(entry)) {
+            return {
+                title: EDITION_NAMES[entry.edition],
+                href: "edition.html?id=" + entry.edition,
+                order: flatten(editionSections(catalog, entry.edition))
+            };
+        }
+        return {
+            title: TEAM_NAMES[entry.team] || "",
+            href: "type.html?id=" + entry.team,
+            order: flatten(typeSections(catalog, entry.team)).filter(function (other) {
+                return !isEditionMember(other);
+            })
+        };
+    }
+
+    function iconUrl(id) {
+        return BASE + "img/official/" + id + "_0.webp";
+    }
+
+    function pageUrl(id) {
+        return "character.html?id=" + encodeURIComponent(id);
+    }
+
+    function side(team) {
+        return (team === "minion" || team === "demon") ? "evil" : "good";
+    }
+
+    // 캐릭터 아이콘 + 이름 격자 (판 페이지·유형 페이지·메인 검색 결과 공용)
+    function grid(entries) {
+        return "<ul class=\"grid\">" + entries.map(function (entry) {
+            return "<li><a class=\"role--" + side(entry.team) + "\" href=\"" + pageUrl(entry.id) + "\">" +
+                "<img src=\"" + iconUrl(entry.id) + "\" alt=\"\" loading=\"lazy\">" + esc(entry.name) + "</a></li>";
+        }).join("") + "</ul>";
+    }
+
+    function sectionsHtml(sections) {
+        return sections.map(function (section) {
+            return (section.title ? "<h2>" + esc(section.title) + "</h2>" : "") + grid(section.entries);
+        }).join("");
+    }
+
+    var CREDIT = "<div class=\"credit\">이 사이트의 캐릭터 문서는 Blood on the Clocktower 공식 위키를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 것으로, 제작사와 관계없는 비공식 번역입니다. " +
+        "<a href=\"https://wiki.bloodontheclocktower.com/\" target=\"_blank\" rel=\"noopener\">원문 위키(영어) 보기</a></div>";
+
+    function notFoundHtml(title, text) {
+        return "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>" +
+            "<div class=\"notfound\"><h2>" + esc(title) + "</h2><p>" + esc(text) + "</p></div>";
     }
 
     window.WikiKo = {
         BASE: BASE,
-        TEAM_NAMES: { townsfolk: "주민", outsider: "외지인", minion: "하수인", demon: "악마", traveller: "여행자", fabled: "전설", loric: "설화" },
-        TEAM_ORDER: ["townsfolk", "outsider", "minion", "demon", "traveller", "fabled", "loric"],
-        GROUPS: GROUPS,
-        groupOf: groupOf,
+        EDITIONS: EDITIONS,
+        EDITION_NAMES: EDITION_NAMES,
+        TYPES: TYPES,
+        TEAM_NAMES: TEAM_NAMES,
+        CREDIT: CREDIT,
         esc: esc,
         getJSON: getJSON,
-        iconUrl: function (id) {
-            return BASE + "img/official/" + id + "_0.webp";
-        },
-        pageUrl: function (id) {
-            return "character.html?id=" + encodeURIComponent(id);
-        },
-        side: function (team) {
-            return (team === "minion" || team === "demon") ? "evil" : "good";
-        }
+        iconUrl: iconUrl,
+        pageUrl: pageUrl,
+        side: side,
+        grid: grid,
+        sectionsHtml: sectionsHtml,
+        editionSections: editionSections,
+        typeSections: typeSections,
+        homeOf: homeOf,
+        notFoundHtml: notFoundHtml
     };
 
 }());
