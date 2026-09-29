@@ -60,6 +60,7 @@ h2 {
 a.role, span.role { font-weight: bold; text-decoration: none; }
 .role--good { color: var(--good); }
 .role--evil { color: var(--evil); }
+.role--traveller { color: #7d2182; }
 .credit {
     margin-top: 2.5em;
     padding-top: 1em;
@@ -87,6 +88,24 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 .crumbs__steps a { font-weight: normal; }
 .lead { font-size: 15px; color: #222; margin: 0.6em 0 1em; }
 
+/* 위키 목차 상자 (#toc) — 에디션·유형 페이지 공용 */
+#toc {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--wiki-border);
+    padding: 0.6em 1em 0.7em;
+    margin: 0.2em 0 1.4em;
+    font-size: 13.3px;
+}
+#toc .toctitle { font-family: "Song Myung", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
+#toc ol { list-style: none; margin: 0; padding: 0; }
+#toc li { margin: 0.15em 0; }
+#toc a { color: #2a5aa0; text-decoration: none; }
+#toc .tocnumber { color: #222; margin-right: 0.4em; }
+/* 위키 본문 문단 (소개글·줄거리·게임 방식) */
+.wiki-text { color: var(--wiki-maroon); font-size: 15px; }
+.wiki-text p { margin: 0 0 1em; }
+
 /* 캐릭터 아이콘 + 이름 격자 */
 .grid {
     list-style: none;
@@ -112,7 +131,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 .grid img { width: 64px; height: 64px; object-fit: contain; }
 /* 넓은 화면: 위키처럼 한 줄 6칸 안팎, 아이콘 크게 */
 @media (min-width: 900px) {
-    .grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 18px 8px; }
+    .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px 8px; }
     .grid a { font-size: 15px; }
     .grid img { width: 96px; height: 96px; margin-bottom: 10px; }
 }

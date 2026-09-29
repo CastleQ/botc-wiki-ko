@@ -28,7 +28,9 @@
     var id = new URLSearchParams(window.location.search).get("id") || "";
     var name = Object.prototype.hasOwnProperty.call(W.TEAM_NAMES, id) ? W.TEAM_NAMES[id] : "";
 
-    function render(catalog) {
+    // 위키 소개글이 있는 유형(여행자)은 위키 문서와 같이: 제목 → 소개글 → 목차 → 묶음별 격자.
+    // 소개글이 없는 유형은 캐릭터 수 한 줄 → 묶음별 격자.
+    function render(catalog, story) {
         var sections = W.typeSections(catalog, id);
         var count = sections.reduce(function (sum, section) {
             return sum + section.entries.length;
@@ -37,9 +39,29 @@
 
         document.title = name + " — BOTC Wiki 한글번역 페이지";
         html += "<h1 class=\"title\">" + esc(name) + "</h1>";
-        html += "<p class=\"lead\">" + esc(name) + " 캐릭터 " + count + "개</p>";
-        html += W.sectionsHtml(sections);
-        html += W.CREDIT;
+        if (story) {
+            var byId = W.indexById(catalog);
+            html += "<div class=\"wiki-text\">" + story.sections.map(function (section) {
+                return section.blocks.map(function (block) {
+                    return "<p>" + W.richText(block.p || "", byId) + "</p>";
+                }).join("");
+            }).join("") + "</div>";
+            html += "<nav id=\"toc\"><div class=\"toctitle\">목차</div><ol>" + sections.map(function (section, index) {
+                return "<li><a href=\"#group-" + index + "\"><span class=\"tocnumber\">" + (index + 1) + "</span>" + esc(section.title) + "</a></li>";
+            }).join("") + "</ol></nav>";
+        } else {
+            html += "<p class=\"lead\">" + esc(name) + " 캐릭터 " + count + "개</p>";
+        }
+        html += sections.map(function (section, index) {
+            return (section.title ? "<h2 id=\"group-" + index + "\">" + esc(section.title) + "</h2>" : "") + W.grid(section.entries);
+        }).join("");
+        if (story) {
+            html += "<div class=\"credit\">이 페이지의 소개글은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
+                ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
+                "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(story.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
+        } else {
+            html += W.CREDIT;
+        }
         page.innerHTML = html;
     }
 
@@ -48,8 +70,14 @@
         return;
     }
 
-    W.getJSON("guide/data/catalog.json")
-        .then(render)
+    // 소개글 번역을 못 읽어도 목록은 보여 준다.
+    Promise.all([
+        W.getJSON("guide/data/catalog.json"),
+        W.TYPE_PAGES.indexOf(id) === -1 ? null : W.getJSON("guide/data/pages/" + id + ".json").catch(function () { return null; })
+    ])
+        .then(function (data) {
+            render(data[0], data[1]);
+        })
         .catch(function () {
             page.innerHTML = W.notFoundHtml("목록을 불러오지 못했습니다", "잠시 뒤 다시 열어 주세요.") + W.CREDIT;
         });

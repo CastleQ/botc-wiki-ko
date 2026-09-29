@@ -33,6 +33,17 @@
     // 판 페이지에 나오는 유형 (위키 판 페이지에는 여행자가 없다)
     var EDITION_TEAMS = ["townsfolk", "outsider", "minion", "demon"];
 
+    // 위키 Travellers 문서의 묶음 순서와 묶음 안 순서. 여기에 없는 새 여행자는 그 판 묶음 맨 뒤(가나다순)로 간다.
+    var TRAVELLER_GROUPS = [
+        { edition: "tb", ids: ["scapegoat", "gunslinger", "beggar", "bureaucrat", "thief"] },
+        { edition: "snv", ids: ["butcher", "bonecollector", "harlot", "barista", "deviant"] },
+        { edition: "bmr", ids: ["apprentice", "matron", "voudon", "judge", "bishop"] },
+        { edition: "exp", ids: ["cacklejack", "gangster", "gnome"] }
+    ];
+
+    // 위키 소개글 번역이 있는 유형 (PG+ guide/data/pages/<유형>.json). 없는 유형은 요청하지 않는다.
+    var TYPE_PAGES = ["traveller"];
+
     // 위키 Fabled 문서의 묶음. 여기에 없는 새 전설은 맨 뒤 "기타"로 모인다.
     var FABLED_GROUPS = [
         { title: "사회적 상호작용 & 접근성", ids: ["angel", "buddhist", "doomsayer", "fiddler", "hellslibrarian", "revolutionary", "toymaker"] },
@@ -87,7 +98,7 @@
 
     // 유형 페이지 묶음
     //  - 주민·외지인·하수인·악마: 가나다순, 초성 머리글자로 묶음
-    //  - 여행자: 판별 (점철되는 혼란 → 피로 물든 달 → 화단에 꽃피운 이단 → 실험)
+    //  - 여행자: 위키 순서 (점철되는 혼란 → 화단에 꽃피운 이단 → 피로 물든 달 → 실험, 묶음 안도 위키 순서)
     //  - 전설: 위키 묶음 (사회적 상호작용 & 접근성 / 커스텀 스크립트 / 실험), 묶음 안은 가나다순
     //  - 설화: 가나다순 한 묶음
     function typeSections(catalog, team) {
@@ -97,12 +108,18 @@
         var sections = [];
 
         if (team === "traveller") {
-            ["tb", "bmr", "snv", "exp"].forEach(function (editionId) {
+            TRAVELLER_GROUPS.forEach(function (group) {
                 var entries = members.filter(function (entry) {
-                    return entry.edition === editionId;
+                    return entry.edition === group.edition;
+                }).sort(function (a, b) {
+                    var ia = group.ids.indexOf(a.id);
+                    var ib = group.ids.indexOf(b.id);
+                    ia = ia === -1 ? group.ids.length : ia;
+                    ib = ib === -1 ? group.ids.length : ib;
+                    return ia - ib || byName(a, b);
                 });
                 if (entries.length) {
-                    sections.push({ title: EDITION_NAMES[editionId], entries: entries });
+                    sections.push({ title: EDITION_NAMES[group.edition], entries: entries });
                 }
             });
             return sections;
@@ -185,7 +202,11 @@
         return "character.html?id=" + encodeURIComponent(id);
     }
 
+    // 이름 색: 선 파랑 / 악 빨강 / 여행자 보라 (위키와 같게)
     function side(team) {
+        if (team === "traveller") {
+            return "traveller";
+        }
         return (team === "minion" || team === "demon") ? "evil" : "good";
     }
 
@@ -238,6 +259,7 @@
         EDITIONS: EDITIONS,
         EDITION_NAMES: EDITION_NAMES,
         TYPES: TYPES,
+        TYPE_PAGES: TYPE_PAGES,
         TEAM_NAMES: TEAM_NAMES,
         CREDIT: CREDIT,
         esc: esc,
