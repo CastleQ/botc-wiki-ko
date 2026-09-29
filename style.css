@@ -1,0 +1,71 @@
+/* 포켓 그리모어 캐릭터 도감 — 공용 모양.
+   양피지 분위기는 포켓 그리모어 플러스+의 캐릭터 가이드(guide.html)를 따른다.
+   장식 이미지는 PG+ 배포본(/pocket-grimoire/guide/img/)을 읽는다. 공식 로고는 쓰지 않는다. */
+:root {
+    --wiki-maroon: #5C1F22;
+    --wiki-border: #BDA89A;
+    --good: #3297F4;
+    --evil: #8C0E12;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+    font-family: "Noto Sans KR", sans-serif;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+    color: #222;
+    background: #2b1633 url("/pocket-grimoire/guide/img/background.webp") center / cover fixed;
+}
+.tab-bar {
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    text-align: center;
+}
+.tab-bar a {
+    color: #e9d9b5;
+    font-family: "Song Myung", serif;
+    font-size: 18px;
+    text-decoration: none;
+}
+.tab-bar small { font-family: "Noto Sans KR", sans-serif; font-size: 12px; opacity: 0.8; }
+.page {
+    background: #efe6d6 url("/pocket-grimoire/guide/img/content-background.webp") center / cover;
+    padding: 16px 16px 32px;
+    min-height: calc(100vh - 45px);
+    color: var(--wiki-maroon);
+    max-width: 960px;
+    margin: 0 auto;
+}
+h1.title {
+    font-family: "Song Myung", serif;
+    font-weight: normal;
+    font-size: 36px;
+    color: var(--wiki-maroon);
+    margin: 0.4em 0 0;
+    line-height: 1.2;
+}
+h2 {
+    font-family: "Song Myung", serif;
+    font-weight: normal;
+    font-size: 23px;
+    color: var(--wiki-maroon);
+    margin: 1.2em 0 0.4em;
+    border-bottom: 1px solid rgba(92, 31, 34, 0.25);
+    padding-bottom: 0.15em;
+}
+a.role, span.role { font-weight: bold; text-decoration: none; }
+.role--good { color: var(--good); }
+.role--evil { color: var(--evil); }
+.credit {
+    margin-top: 2.5em;
+    padding-top: 1em;
+    border-top: 1px solid rgba(92, 31, 34, 0.25);
+    font-size: 13px;
+    color: #6d5a4f;
+}
+.credit a { color: var(--wiki-maroon); }
+.notfound { text-align: center; padding: 3em 1em; }
