@@ -51,7 +51,7 @@ h1.title {
 h2 {
     font-family: "Song Myung", serif;
     font-weight: normal;
-    font-size: 23px;
+    font-size: 21px;
     color: var(--wiki-maroon);
     margin: 1.2em 0 0.4em;
     border-bottom: 1px solid rgba(92, 31, 34, 0.25);
@@ -69,6 +69,8 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 }
 .credit a { color: var(--wiki-maroon); }
 .notfound { text-align: center; padding: 3em 1em; }
+/* 두 칸 배치 페이지(에디션)는 더 넓게 */
+.page.page--wide { max-width: 1200px; }
 
 /* 위쪽 이동 막대: 메인으로 · 돌아갈 페이지 / 이전·다음 */
 .crumbs {
@@ -108,6 +110,12 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 }
 .grid a:hover, .grid a:focus-visible { background: rgba(255, 255, 255, 0.55); }
 .grid img { width: 64px; height: 64px; object-fit: contain; }
+/* 넓은 화면: 위키처럼 한 줄 6칸 안팎, 아이콘 크게 */
+@media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 18px 8px; }
+    .grid a { font-size: 15px; }
+    .grid img { width: 96px; height: 96px; margin-bottom: 10px; }
+}
 
 /* 메인의 판·유형 타일 (위키 메인 모양) */
 .tiles {

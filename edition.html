@@ -10,31 +10,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;700&family=Gowun+Batang&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-/* 판 페이지 — 공식 위키 판 문서 구조: 판 로고 → 유형별 이름 표 → 유형별 아이콘 격자.
-   줄거리·게임 방식은 PG+ guide/data/pages/<판>.json 번역을 표 뒤에 넣는다(위키와 같은 순서). 여행자는 위키와 같이 판 페이지에 넣지 않는다(여행자 유형 페이지에 판별로 있음). */
-.edition-logo { display: block; width: 200px; height: 200px; margin: 0.5em auto; object-fit: contain; }
-.edition-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.75);
+/* 판 페이지 — 공식 위키 판 문서(pivot 스킨)와 같은 구조·모양.
+   제목 → [오른쪽 정보 상자 #edition-details: 판 로고 + 유형별 캐릭터 표] / [본문: 줄거리 → 목차 → 게임 방식 → 유형별 아이콘 격자].
+   넓은 화면은 본문 3 : 정보 상자 1 두 칸, 좁은 화면은 정보 상자가 제목 아래로 먼저 온다.
+   줄거리·게임 방식은 PG+ guide/data/pages/<판>.json 번역. 여행자는 위키와 같이 판 페이지에 넣지 않는다(여행자 유형 페이지에 판별로 있음).
+   값은 위키 스타일시트(skins.pivot)에서 옮겼다: 제목 #5C1F22, h2 21px + #BDA89A 밑줄, 상자 배경 rgba(255,255,255,.75) + #BDA89A 테두리. */
+.edition-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 24px; }
+.edition-main { color: var(--wiki-maroon); font-size: 15px; }
+.edition-main p { margin: 0 0 1em; }
+#edition-details {
+    background-color: rgba(255, 255, 255, 0.75);
     border: 1px solid var(--wiki-border);
-    font-size: 14.5px;
-    color: #222;
+    padding: 1.5em 0 0.3em;
+    margin-bottom: 1.5em;
+    text-align: center;
 }
-.edition-table th, .edition-table td { padding: 0.55em 0.6em; text-align: left; vertical-align: top; }
-.edition-table th { width: 5em; font-weight: normal; color: #000; white-space: nowrap; }
-.edition-table tr:nth-child(odd) { background: #fff; }
-.edition-table tr:nth-child(even) { background: #f7f5f2; }
-.edition-table a { font-weight: bold; text-decoration: none; }
-.story p { color: #222; font-size: 15.5px; }
-.story--synopsis p { font-family: "Gowun Batang", serif; font-style: italic; }
+#edition-details .edition-logo { display: block; width: 200px; height: 200px; margin: 0 auto 1em; object-fit: contain; }
+#edition-details-characters { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.6; }
+#edition-details-characters td { padding: 0 0.6em 1.1em; vertical-align: top; text-align: left; }
+.edition-details-characters-title { text-align: right !important; font-weight: bold; color: #000; white-space: nowrap; width: 45%; }
+#edition-details-characters a { display: block; color: #2a5aa0; text-decoration: none; }
+#edition-details-characters a:hover { text-decoration: underline; }
+.story--synopsis p { font-style: italic; font-family: "Gowun Batang", serif; }
+#toc {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--wiki-border);
+    padding: 0.6em 1em 0.7em;
+    margin: 0.2em 0 1.4em;
+    font-size: 13.3px;
+}
+#toc .toctitle { font-family: "Song Myung", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
+#toc ol { list-style: none; margin: 0; padding: 0; }
+#toc li { margin: 0.15em 0; }
+#toc a { color: #2a5aa0; text-decoration: none; }
+#toc .tocnumber { color: #222; margin-right: 0.4em; }
+@media (min-width: 900px) {
+    .edition-layout { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+    .edition-main { grid-column: 1; grid-row: 1; }
+    #edition-details { grid-column: 2; grid-row: 1; align-self: start; }
+}
 </style>
 </head>
 <body>
 <nav class="tab-bar">
     <a href="./">포켓 그리모어 캐릭터 도감 <small>(비공식 한국어 번역)</small></a>
 </nav>
-<main class="page" id="page"></main>
+<main class="page page--wide" id="page"></main>
 
 <script src="common.js"></script>
 <script>
@@ -53,29 +75,49 @@
 
     function render(catalog, story) {
         var sections = W.editionSections(catalog, edition.id);
+        var byId = W.indexById(catalog);
+        var storySections = story ? story.sections : [];
+        // 목차: 위키와 같이 줄거리 · 게임 방식 · 주민 · 외지인 · 하수인 · 악마 순
+        var toc = storySections.map(function (section) {
+            return { anchor: section.key, title: section.title };
+        }).concat(sections.map(function (section, index) {
+            return { anchor: "team-" + index, title: section.title };
+        }));
         var html = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>";
 
         document.title = edition.name + " — 포켓 그리모어 캐릭터 도감";
         html += "<h1 class=\"title\">" + esc(edition.name) + "</h1>";
+        html += "<div class=\"edition-layout\">";
+
+        // 오른쪽 정보 상자: 판 로고 + 유형별 캐릭터 (이름을 세로로)
+        html += "<aside id=\"edition-details\">";
         html += "<img class=\"edition-logo\" src=\"" + edition.logo + "\" alt=\"" + esc(edition.alt) + "\">";
-
-        html += "<table class=\"edition-table\">" + sections.map(function (section) {
-            return "<tr><th>" + esc(section.title) + "</th><td>" + section.entries.map(function (entry) {
-                return "<a class=\"role--" + W.side(entry.team) + "\" href=\"" + W.pageUrl(entry.id) + "\">" + esc(entry.name) + "</a>";
-            }).join(" · ") + "</td></tr>";
+        html += "<table id=\"edition-details-characters\">" + sections.map(function (section) {
+            return "<tr><td class=\"edition-details-characters-title\">" + esc(section.title) + "</td><td>" +
+                section.entries.map(function (entry) {
+                    return "<a href=\"" + W.pageUrl(entry.id) + "\">" + esc(entry.name) + "</a>";
+                }).join("") + "</td></tr>";
         }).join("") + "</table>";
+        html += "</aside>";
 
-        if (story) {
-            var byId = W.indexById(catalog);
-            story.sections.forEach(function (section) {
-                html += "<section class=\"story story--" + esc(section.key) + "\"><h2>" + esc(section.title) + "</h2>" +
-                    section.blocks.map(function (block) {
-                        return "<p>" + W.richText(block.p || "", byId) + "</p>";
-                    }).join("") + "</section>";
-            });
-        }
+        html += "<div class=\"edition-main\">";
+        storySections.forEach(function (section, index) {
+            html += "<section class=\"story story--" + esc(section.key) + "\"><h2 id=\"" + esc(section.key) + "\">" + esc(section.title) + "</h2>" +
+                section.blocks.map(function (block) {
+                    return "<p>" + W.richText(block.p || "", byId) + "</p>";
+                }).join("") + "</section>";
+            // 위키처럼 첫 구역(줄거리) 바로 뒤에 목차
+            if (index === 0) {
+                html += "<nav id=\"toc\"><div class=\"toctitle\">목차</div><ol>" + toc.map(function (item, n) {
+                    return "<li><a href=\"#" + item.anchor + "\"><span class=\"tocnumber\">" + (n + 1) + "</span>" + esc(item.title) + "</a></li>";
+                }).join("") + "</ol></nav>";
+            }
+        });
+        html += sections.map(function (section, index) {
+            return "<h2 id=\"team-" + index + "\">" + esc(section.title) + "</h2>" + W.grid(section.entries);
+        }).join("");
+        html += "</div></div>";
 
-        html += W.sectionsHtml(sections);
         if (story) {
             html += "<div class=\"credit\">이 페이지의 줄거리·게임 방식은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
                 ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
