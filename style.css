@@ -6,18 +6,11 @@
     --good: #3297F4;
     --evil: #8C0E12;
 }
-/* 제목 글꼴: 그레이스 세리프 (눈누 배포, jsDelivr) — 보통 글씨는 Regular(500), 굵게는 Bold(700) 파일을 쓴다.
-   이 글꼴을 못 받으면 기본 명조로 보인다. */
+/* 제목 글꼴: 국민대학교 성곡 세리프 (눈누 배포, jsDelivr). 이 글꼴을 못 받으면 기본 명조로 보인다. */
 @font-face {
-    font-family: "ElegantSerif";
-    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/GraceSerif-Regular.woff2") format("woff2");
+    font-family: "KookminUniversitySunggokSerif";
+    src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2607101542@kmu80sungkokserif/kmu80sungkokserif/KMU80SungkokSerif.woff2") format("woff2");
     font-weight: 500;
-    font-display: swap;
-}
-@font-face {
-    font-family: "ElegantSerif";
-    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/GraceSerif-Bold.woff2") format("woff2");
-    font-weight: 700;
     font-display: swap;
 }
 /* 이야기풍 문장 글꼴(캐릭터 제목 아래 한 줄, 에디션 줄거리): 산하엽 Diphylleia (눈누 배포, jsDelivr) */
@@ -47,7 +40,7 @@ body {
 }
 .tab-bar a {
     color: #e9d9b5;
-    font-family: "ElegantSerif", serif;
+    font-family: "KookminUniversitySunggokSerif", serif;
     font-size: 18px;
     text-decoration: none;
 }
@@ -61,7 +54,7 @@ body {
     margin: 0 auto;
 }
 h1.title {
-    font-family: "ElegantSerif", serif;
+    font-family: "KookminUniversitySunggokSerif", serif;
     font-weight: normal;
     font-size: 36px;
     color: var(--wiki-maroon);
@@ -69,7 +62,7 @@ h1.title {
     line-height: 1.2;
 }
 h2 {
-    font-family: "ElegantSerif", serif;
+    font-family: "KookminUniversitySunggokSerif", serif;
     font-weight: normal;
     font-size: 21px;
     color: var(--wiki-maroon);
@@ -119,7 +112,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
     margin: 0.2em 0 1.4em;
     font-size: 13.3px;
 }
-#toc .toctitle { font-family: "ElegantSerif", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
+#toc .toctitle { font-family: "KookminUniversitySunggokSerif", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
 #toc ol { list-style: none; margin: 0; padding: 0; }
 #toc li { margin: 0.15em 0; }
 #toc a { color: #2a5aa0; text-decoration: none; }
@@ -204,7 +197,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 }
 .sidebar__label {
     text-align: center;
-    font-family: "ElegantSerif", serif;
+    font-family: "KookminUniversitySunggokSerif", serif;
     font-weight: bold;
     font-size: 18px;
     color: #fff;
