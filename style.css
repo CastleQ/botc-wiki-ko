@@ -1,16 +1,15 @@
-/* 포켓 그리모어 캐릭터 도감 — 공용 모양.
-   양피지 분위기는 포켓 그리모어 플러스+의 캐릭터 가이드(guide.html)를 따른다.
-   장식 이미지는 PG+ 배포본(/pocket-grimoire/guide/img/)을 읽는다. 공식 로고는 쓰지 않는다. */
+/* BOTC Wiki 한글번역 페이지 — 공용 모양.
+   배치·색은 공식 위키(pivot 스킨)를 따르고, 양피지 배경 등 장식 이미지는 PG+ 배포본(/pocket-grimoire/guide/img/)을 읽는다. */
 :root {
     --wiki-maroon: #5C1F22;
     --wiki-border: #BDA89A;
     --good: #3297F4;
     --evil: #8C0E12;
 }
-/* 제목 글꼴: 국민대학교 성곡 세리프 (눈누 배포, jsDelivr). 이 글꼴을 못 받으면 기본 명조로 보인다. */
+/* 제목 글꼴: 스텔라 세리프 Bold Condensed (눈누 배포, jsDelivr). 이 글꼴을 못 받으면 기본 명조로 보인다. */
 @font-face {
-    font-family: "KookminUniversitySunggokSerif";
-    src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2607101542@kmu80sungkokserif/kmu80sungkokserif/KMU80SungkokSerif.woff2") format("woff2");
+    font-family: "Stella";
+    src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2608201622@stellar-serif/stellar-serif/Stellar_Serif_Bold_Condensed.woff2") format("woff2");
     font-weight: 400;
     font-display: swap;
 }
@@ -41,7 +40,7 @@ body {
 }
 .tab-bar a {
     color: #e9d9b5;
-    font-family: "KookminUniversitySunggokSerif", serif;
+    font-family: "Stella", serif;
     font-size: 18px;
     text-decoration: none;
 }
@@ -55,7 +54,7 @@ body {
     margin: 0 auto;
 }
 h1.title {
-    font-family: "KookminUniversitySunggokSerif", serif;
+    font-family: "Stella", serif;
     font-weight: normal;
     font-size: 36px;
     color: var(--wiki-maroon);
@@ -63,7 +62,7 @@ h1.title {
     line-height: 1.2;
 }
 h2 {
-    font-family: "KookminUniversitySunggokSerif", serif;
+    font-family: "Stella", serif;
     font-weight: normal;
     font-size: 21px;
     color: var(--wiki-maroon);
@@ -113,7 +112,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
     margin: 0.2em 0 1.4em;
     font-size: 13.3px;
 }
-#toc .toctitle { font-family: "KookminUniversitySunggokSerif", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
+#toc .toctitle { font-family: "Stella", serif; font-size: 15px; color: #000; text-align: center; margin-bottom: 0.3em; }
 #toc ol { list-style: none; margin: 0; padding: 0; }
 #toc li { margin: 0.15em 0; }
 #toc a { color: #2a5aa0; text-decoration: none; }
@@ -198,7 +197,7 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 }
 .sidebar__label {
     text-align: center;
-    font-family: "KookminUniversitySunggokSerif", serif;
+    font-family: "Stella", serif;
     font-weight: bold;
     font-size: 18px;
     color: #fff;
