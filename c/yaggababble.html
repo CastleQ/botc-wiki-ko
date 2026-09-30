@@ -102,6 +102,16 @@ audio { width: 90%; margin: 0.5em 0 10px; }
 #jinxes .jinx-icon { width: 60px; height: 60px; object-fit: contain; }
 #jinxes .jinx-name { margin: 0; font-size: 16px; }
 #jinxes .jinx-reason { margin: 0.2em 0 0; font-style: italic; font-size: 14.5px; color: #222; }
+/* 넓은 화면: 위키 캐릭터 문서 배치 — 오른쪽 정보 상자·징크스(large-3) + 왼쪽 본문(large-9),
+   본문 첫 줄은 요약 | 진행 방법 반반(large-6), 나머지 구역은 본문 폭 전체. 좁은 화면은 위에서 아래로 그대로. */
+@media (min-width: 1024px) {
+    .char-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 0 24px; align-items: start; }
+    .char-main { grid-column: 1; grid-row: 1; }
+    .char-aside { grid-column: 2; grid-row: 1; }
+    .char-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 24px; }
+    .char-main > :first-child h2, .char-top h2 { margin-top: 0; }
+    p.flavour { padding: 16px 20px 0; }
+}
 </style>
 </head>
 <body>
@@ -210,6 +220,7 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         html += "<h1 class=\"title\">" + esc(self.name) + "</h1>";
         html += "<h3 id=\"tagline\">시계탑에 흐른 피 위키에서</h3>";
 
+        html += "<div class=\"char-layout\"><aside class=\"char-aside\">";
         html += "<div id=\"character-details\">";
         html += "<img class=\"icon\" src=\"" + W.iconUrl(esc(guide.id)) + "\" alt=\"\">";
         html += "<span class=\"details-label\">정보</span>";
@@ -239,13 +250,20 @@ audio { width: 90%; margin: 0.5em 0 10px; }
             }).join("") + "</table></div>";
         }
 
-        guide.sections.forEach(function (section) {
-            html += "<section class=\"section\"><h2>" + rich(section.title, self) + "</h2>";
-            html += section.blocks.map(function (block) {
-                return renderBlock(block, self);
-            }).join("");
-            html += "</section>";
-        });
+        html += "</aside><div class=\"char-main\">";
+        var sectionHtml = function (section) {
+            return "<section class=\"section\"><h2>" + rich(section.title, self) + "</h2>" +
+                section.blocks.map(function (block) {
+                    return renderBlock(block, self);
+                }).join("") + "</section>";
+        };
+        // 위키처럼 요약과 진행 방법이 맨 앞에 있으면 두 칸으로 나란히
+        var sections = guide.sections.slice();
+        if (sections.length >= 2 && sections[0].key === "summary" && sections[1].key === "how-to-run") {
+            html += "<div class=\"char-top\">" + sectionHtml(sections.shift()) + sectionHtml(sections.shift()) + "</div>";
+        }
+        html += sections.map(sectionHtml).join("");
+        html += "</div></div>";
 
         html += "<div class=\"credit\">이 페이지는 Blood on the Clocktower 공식 위키 문서(판 " + esc(guide.source.oldid) +
             ", " + esc(guide.source.lastEdited) + " 수정)를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 페이지입니다. " +
