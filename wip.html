@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>BOTC Wiki 한글번역 페이지</title>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;700&family=Gowun+Batang&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="tab-bar">
+    <a href="./">BOTC Wiki 한글번역 페이지</a>
+</nav>
+<main class="page" id="page"></main>
+
+<script src="common.js"></script>
+<script>
+// 아직 만들지 않은 위키 문서 자리 — 왼쪽 메뉴에서 wip.html?p=<키>로 들어온다. 제목 목록은 common.js의 WIP_PAGES.
+(function () {
+
+    var W = window.WikiKo;
+    var key = new URLSearchParams(window.location.search).get("p") || "";
+    var title = Object.prototype.hasOwnProperty.call(W.WIP_PAGES, key) ? W.WIP_PAGES[key] : "준비 중인 문서";
+
+    document.title = title + " — BOTC Wiki 한글번역 페이지";
+    document.getElementById("page").innerHTML =
+        "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>" +
+        "<h1 class=\"title\">" + W.esc(title) + "</h1>" +
+        "<p class=\"wiki-text\">아직 작업 중 이에요 :)</p>";
+
+}());
+</script>
+</body>
+</html>

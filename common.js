@@ -262,6 +262,23 @@
     var CREDIT = "<div class=\"credit\">이 사이트의 캐릭터 문서는 Blood on the Clocktower 공식 위키를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 것으로, 제작사와 관계없는 비공식 번역입니다. " +
         "<a href=\"https://wiki.bloodontheclocktower.com/\" target=\"_blank\" rel=\"noopener\">원문 위키(영어) 보기</a></div>";
 
+    // 아직 만들지 않은 위키 문서 (왼쪽 메뉴에서 wip.html?p=<키>로 연결)
+    var WIP_PAGES = {
+        "glossary": "용어집",
+        "storyteller-advice": "이야기꾼 조언",
+        "player-strategy": "플레이어 전략",
+        "changelog": "변경 이력",
+        "setup": "게임 준비",
+        "rules": "규칙 설명",
+        "abilities": "능력",
+        "states": "상태",
+        "teensyville": "틴시빌",
+        "script-tool": "스크립트 도구",
+        "experimental": "실험 캐릭터",
+        "recent-changes": "최근 바뀜",
+        "random": "임의 문서"
+    };
+
     function notFoundHtml(title, text) {
         return "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>" +
             "<div class=\"notfound\"><h2>" + esc(title) + "</h2><p>" + esc(text) + "</p></div>";
@@ -287,7 +304,45 @@
         editionSections: editionSections,
         typeSections: typeSections,
         homeOf: homeOf,
-        notFoundHtml: notFoundHtml
+        notFoundHtml: notFoundHtml,
+        WIP_PAGES: WIP_PAGES
     };
+
+    // ── 왼쪽 메뉴 (공식 위키 pivot 스킨의 사이드바) ──
+    // 넓은 화면(1024px 이상)에서만 보인다. 좁은 화면은 위쪽 보라색 막대를 그대로 쓴다.
+    // 아직 만들지 않은 문서는 wip.html?p=<키> ("아직 작업 중 이에요 :)")로 보낸다.
+    function mountSidebar() {
+        var menu = [
+            { title: "게임 정보", items: ["glossary", "storyteller-advice", "player-strategy", "changelog"] },
+            { title: "규칙서", items: ["setup", "rules", "abilities", "states", "teensyville", "script-tool"] },
+            { title: "캐릭터", items: EDITIONS.map(function (edition) {
+                return [edition.name, "edition.html?id=" + edition.id];
+            }).concat(["traveller", "fabled", "loric"].map(function (team) {
+                return [TEAM_NAMES[team], "type.html?id=" + team];
+            })).concat(["experimental"]) },
+            { title: "둘러보기", items: ["recent-changes", "random"] }
+        ];
+        var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;
+        var html = "<a class=\"sidebar__logo\" href=\"./\"><img src=\"" + BASE + "guide/img/logo.png\" alt=\"Blood on the Clocktower\"></a>" +
+            "<form class=\"sidebar__search\" action=\"./\" method=\"get\" role=\"search\">" +
+            "<input type=\"search\" name=\"q\" id=\"side-search\" placeholder=\"찾기\" autocomplete=\"off\"></form>";
+        menu.forEach(function (group) {
+            html += "<div class=\"sidebar__label\">" + esc(group.title) + "</div><ul>" + group.items.map(function (item) {
+                var label = Array.isArray(item) ? item[0] : WIP_PAGES[item];
+                var href = Array.isArray(item) ? item[1] : "wip.html?p=" + item;
+                return "<li><a href=\"" + href + "\"" + (href === here ? " aria-current=\"page\"" : "") + ">" + esc(label) + "</a></li>";
+            }).join("") + "</ul>";
+        });
+        var aside = document.createElement("aside");
+        aside.className = "sidebar";
+        aside.innerHTML = html;
+        document.body.insertBefore(aside, document.body.firstChild);
+        var params = new URLSearchParams(window.location.search);
+        if (params.get("q")) {
+            aside.querySelector("#side-search").value = params.get("q");
+        }
+    }
+
+    mountSidebar();
 
 }());

@@ -28,6 +28,16 @@
 [hidden] { display: none !important; }
 /* 공식 위키 로고 (PG+ guide/img/logo.png — 위키 원본과 같은 파일) */
 .main-logo { display: block; width: 160px; height: auto; margin: 0.4em 0 0; }
+/* 넓은 화면: 위키 Main Page — 로고·검색은 왼쪽 메뉴에 있으므로 본문에서 숨기고,
+   판 로고는 한 줄 4칸(위키 large-3), 유형 아이콘은 한 줄 6칸(위키 large-2)에 4개 + 3개 두 줄 */
+@media (min-width: 1024px) {
+    .main-logo, .search { display: none; }
+    .tiles--editions { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 16px; }
+    .tiles--editions img { width: 220px; height: 220px; }
+    .tiles--types { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 16px; }
+    .tiles--types img { width: 150px; height: 150px; }
+    .tiles a { font-size: 18px; }
+}
 </style>
 </head>
 <body>
@@ -45,9 +55,10 @@
     </div>
     <div id="sections">
         <h2>에디션별 캐릭터</h2>
-        <ul class="tiles" id="editions"></ul>
+        <ul class="tiles tiles--editions" id="editions"></ul>
         <h2>유형별 캐릭터</h2>
-        <ul class="tiles" id="types"></ul>
+        <ul class="tiles tiles--types" id="types"></ul>
+        <ul class="tiles tiles--types" id="types-special"></ul>
     </div>
     <div id="credit"></div>
 </main>
@@ -73,9 +84,12 @@
     document.getElementById("editions").innerHTML = W.EDITIONS.map(function (edition) {
         return tile("edition.html?id=" + edition.id, edition.logo, edition.alt, edition.name);
     }).join("");
-    document.getElementById("types").innerHTML = W.TYPES.map(function (type) {
+    // 위키와 같이 첫 줄 주민·외지인·하수인·악마, 둘째 줄 여행자·전설·설화
+    function typeTile(type) {
         return tile("type.html?id=" + type.id, W.BASE + "guide/img/generic_" + type.id + ".webp", "", type.name);
-    }).join("");
+    }
+    document.getElementById("types").innerHTML = W.TYPES.slice(0, 4).map(typeTile).join("");
+    document.getElementById("types-special").innerHTML = W.TYPES.slice(4).map(typeTile).join("");
     document.getElementById("credit").outerHTML = W.CREDIT;
 
     // 검색: 띄어쓰기를 무시하고 이름에 글자가 들어 있으면 보여 준다. 검색 중에는 판·유형 타일을 숨긴다.
@@ -98,7 +112,26 @@
         resultGrid.innerHTML = W.grid(found);
     }
 
-    search.addEventListener("input", filter);
+    // 본문 검색창(휴대폰)과 왼쪽 메뉴 검색창(PC)을 같은 검색으로 묶는다. 다른 페이지 메뉴에서 찾으면 ./?q=… 로 온다.
+    var sideSearch = document.getElementById("side-search");
+    var initial = new URLSearchParams(window.location.search).get("q") || "";
+    search.value = initial;
+    search.addEventListener("input", function () {
+        if (sideSearch) {
+            sideSearch.value = search.value;
+        }
+        filter();
+    });
+    if (sideSearch) {
+        sideSearch.addEventListener("input", function () {
+            search.value = sideSearch.value;
+            filter();
+        });
+        sideSearch.form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            filter();
+        });
+    }
 
     W.getJSON("guide/data/catalog.json")
         .then(function (data) {
