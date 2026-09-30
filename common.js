@@ -209,8 +209,10 @@
         return BASE + "img/official/" + id + "_0.webp";
     }
 
+    // 캐릭터 페이지 주소: 캐릭터마다 오픈그래프(링크 미리보기)가 들어간 고정 페이지 c/<id>.html
+    // (tools/build-og.js가 character.html을 복사해 만든다)
     function pageUrl(id) {
-        return "character.html?id=" + encodeURIComponent(id);
+        return "c/" + encodeURIComponent(id) + ".html";
     }
 
     // 이름 색: 선 파랑 / 악 빨강 / 여행자 보라 / 전설 금색 / 설화 초록 (위키와 같게)

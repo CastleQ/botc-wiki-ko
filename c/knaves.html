@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<!-- c/<id>.html(캐릭터별 복사본)에서도 style.css·common.js·링크가 사이트 뿌리 기준으로 풀리도록 -->
+<base href="/botc-wiki-ko/">
+<!-- OG: tools/build-og.js가 만든 파일. 직접 고치지 말고 character.html을 고친 뒤 다시 실행 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BOTC Wiki 한글번역 페이지">
+<meta property="og:title" content="BOTC 위키 - 무뢰한">
+<meta property="og:description" content="이야기꾼이 2명입니다: 1명은 거짓을, 1명은 진실만을 말합니다. 게임당 1번, 황혼에, 둘이 바뀔 수도 있습니다.">
+<meta property="og:url" content="https://castleq.github.io/botc-wiki-ko/c/knaves.html">
+<meta property="og:image" content="https://castleq.github.io/botc-wiki-ko/og/knaves.jpg">
+<meta property="og:image:width" content="400">
+<meta property="og:image:height" content="400">
+<meta property="og:image:alt" content="무뢰한">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://castleq.github.io/botc-wiki-ko/c/knaves.html">
+<title>BOTC Wiki 한글번역 페이지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;700&family=Gowun+Batang&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* 캐릭터 페이지 — 포켓 그리모어 플러스+의 public/guide.html을 복사해 고친 것.
+   도감에는 가림막이 없고, 데이터는 PG+ 배포본(/pocket-grimoire/guide/data/)을 읽는다. */
+#tagline {
+    font-family: "Gowun Batang", serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #959595;
+    margin: 0.2em 0 1em;
+    font-weight: normal;
+}
+#character-details {
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--wiki-border);
+    padding: 1.5em 0 0.3em;
+    margin-bottom: 1.5em;
+    text-align: center;
+}
+#character-details .icon { width: 200px; height: 200px; display: block; margin: 0 auto; object-fit: contain; }
+.details-label { display: block; color: #000; font-size: 20px; margin-top: 10px; }
+#character-details table { width: 90%; margin: 0.5em auto; border-collapse: collapse; text-align: left; font-size: 15px; color: #222; }
+#character-details td { padding: 0.55em 0.6em; }
+#character-details tr:nth-child(odd) { background: #fff; }
+#character-details tr:nth-child(even) { background: #f7f5f2; }
+p.flavour { font-size: 16px; color: #000; font-style: italic; padding: 12px 32px 0; }
+.edition-logo { width: 100px; height: 100px; }
+.podcast-by { display: block; color: #000; font-size: 14px; }
+audio { width: 90%; margin: 0.5em 0 10px; }
+.section p, .section li { color: #222; font-size: 15.5px; }
+.section ul { padding-left: 1.2em; margin: 0.3em 0; }
+.section li { margin-bottom: 0.7em; }
+.example {
+    position: relative;
+    width: 78%;
+    margin: 24px auto;
+    padding: 20px 16px;
+    border: 1px solid var(--wiki-border);
+    background-color: rgba(255, 255, 255, 0.45);
+    text-align: center;
+    font-size: 15px;
+    color: #222;
+}
+.example p { margin: 0; }
+.example::before, .example::after {
+    content: " ";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: url("/pocket-grimoire/guide/img/frame.png") center no-repeat;
+}
+.example::before { left: -31px; transform: rotateY(180deg); }
+.example::after { right: -31px; }
+
+/* 관련 징크스 — 위키 #jinxes 상자 재현. 내용은 PG+ 앱의 정발 징크스 문구. */
+#jinxes {
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--wiki-border);
+    padding: 0.8em 0 0.3em;
+    margin-bottom: 1.5em;
+}
+.jinxes__title {
+    display: block;
+    text-align: center;
+    font-family: "Song Myung", serif;
+    font-size: 18px;
+    color: #000;
+    cursor: pointer;
+    user-select: none;
+}
+.jinxes__toggle { color: var(--wiki-maroon); font-size: 15px; }
+#jinxes table { width: 90%; margin: 0.6em auto 0; border-collapse: collapse; }
+#jinxes td { vertical-align: top; padding: 0.4em 0.3em; }
+#jinxes .jinx-icon { width: 60px; height: 60px; object-fit: contain; }
+#jinxes .jinx-name { margin: 0; font-size: 16px; }
+#jinxes .jinx-reason { margin: 0.2em 0 0; font-style: italic; font-size: 14.5px; color: #222; }
+</style>
+</head>
+<body>
+<nav class="tab-bar">
+    <a href="./">BOTC Wiki 한글번역 페이지</a>
+</nav>
+<main class="page" id="page"></main>
+
+<script src="common.js"></script>
+<script>
+(function () {
+
+    var W = window.WikiKo;
+    var esc = W.esc;
+
+    // 판 로고 (PG+ 배포본의 guide/img/). 실험 캐릭터(exp)는 로고가 없다.
+    var EDITIONS = {};
+    W.EDITIONS.forEach(function (edition) {
+        EDITIONS[edition.id] = edition;
+    });
+
+    // 캐릭터 id: c/<id>.html(오픈그래프가 들어간 캐릭터별 페이지) 주소, 또는 예전 주소 character.html?id=<id>
+    var params = new URLSearchParams(window.location.search);
+    var pathMatch = window.location.pathname.match(/\/c\/([a-z_]+)\.html$/);
+    var id = ((pathMatch && pathMatch[1]) || params.get("id") || "").replace(/[^a-z_]/g, "");
+    var page = document.getElementById("page");
+    var roles = {};
+    var translated = [];
+    var jinxes = {};
+    var catalog = [];
+
+    // 본문 표기: {c:id} = 캐릭터 이름(정발 이름 자동), **굵게**, {ability} = 이 캐릭터 능력
+    // 캐릭터 이름 표시: 선(파랑)/악(빨강) 색, 번역된 다른 캐릭터만 링크
+    function roleLabel(roleId) {
+        var role = roles[roleId];
+        if (!role) {
+            return esc(roleId);
+        }
+        var side = W.side(role.team);
+        if (roleId === id || translated.indexOf(roleId) === -1) {
+            return "<span class=\"role role--" + side + "\">" + esc(role.name) + "</span>";
+        }
+        return "<a class=\"role role--" + side + "\" href=\"" + W.pageUrl(roleId) + "\">" + esc(role.name) + "</a>";
+    }
+
+    function rich(text, self) {
+        return esc(text)
+            .replace(/\{ability\}/g, esc(self.ability))
+            .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+            .replace(/\{c:([a-z_]+)\}/g, function (all, roleId) {
+                return roleLabel(roleId);
+            });
+    }
+
+    function renderBlock(block, self) {
+        if (block.p) {
+            return "<p>" + rich(block.p, self) + "</p>";
+        }
+        if (block.ul) {
+            return "<ul>" + block.ul.map(function (item) {
+                return "<li>" + rich(item, self) + "</li>";
+            }).join("") + "</ul>";
+        }
+        if (block.example) {
+            return "<div class=\"example\"><p>" + rich(block.example, self) + "</p></div>";
+        }
+        return "";
+    }
+
+    // 위쪽 이동 막대: 메인으로 · 돌아갈 페이지 + 이전/다음 캐릭터.
+    // 3개 판의 주민·외지인·하수인·악마는 판 페이지 순서, 나머지(실험·여행자·전설·설화)는 유형 페이지 순서 (common.js homeOf).
+    function navBar() {
+        var html = "<nav class=\"crumbs\"><span><a href=\"./\">← 메인으로</a>";
+        var here = null;
+        catalog.forEach(function (entry) {
+            if (entry.id === id) {
+                here = entry;
+            }
+        });
+        if (!here) {
+            return html + "</span></nav>";
+        }
+        var home = W.homeOf(catalog, here);
+        var index = home.order.indexOf(here);
+        var prev = home.order[index - 1];
+        var next = home.order[index + 1];
+        html += " · <a href=\"" + home.href + "\">" + esc(home.title) + "</a></span>";
+        html += "<span class=\"crumbs__steps\">";
+        if (prev) {
+            html += "<a href=\"" + W.pageUrl(prev.id) + "\">‹ " + esc(prev.name) + "</a>";
+        }
+        if (next) {
+            html += "<a href=\"" + W.pageUrl(next.id) + "\">" + esc(next.name) + " ›</a>";
+        }
+        return html + "</span></nav>";
+    }
+
+    function render(guide) {
+
+        var self = roles[guide.id];
+        var edition = EDITIONS[guide.edition];
+        var html = navBar();
+
+        document.title = self.name + " — BOTC Wiki 한글번역 페이지";
+
+        html += "<h1 class=\"title\">" + esc(self.name) + "</h1>";
+        html += "<h3 id=\"tagline\">시계탑에 흐른 피 위키에서</h3>";
+
+        html += "<div id=\"character-details\">";
+        html += "<img class=\"icon\" src=\"" + W.iconUrl(esc(guide.id)) + "\" alt=\"\">";
+        html += "<span class=\"details-label\">정보</span>";
+        html += "<table><tr><td>유형</td><td>" + esc(W.TEAM_NAMES[self.team] || "") + "</td></tr>";
+        html += "<tr><td>아티스트</td><td>" + esc(guide.artist || "") + "</td></tr></table>";
+        if (self.flavor) {
+            html += "<p class=\"flavour\">\"" + esc(self.flavor) + "\"</p>";
+        }
+        if (edition) {
+            html += "<span class=\"details-label\">수록 에디션</span>";
+            html += "<img class=\"edition-logo\" src=\"" + esc(edition.logo) + "\" alt=\"" + esc(edition.alt) + "\">";
+        }
+        if (guide.podcast) {
+            html += "<span class=\"details-label\" style=\"margin-top:20px\">Cult of the Clocktower 에피소드</span>";
+            html += "<span class=\"podcast-by\">by " + esc(guide.podcast.by) + "</span>";
+            html += "<audio controls preload=\"none\" src=\"" + esc(guide.podcast.audio) + "\"></audio>";
+        }
+        html += "</div>";
+
+        var related = jinxes[guide.id] || [];
+        if (related.length) {
+            html += "<div id=\"jinxes\"><span class=\"jinxes__title\" id=\"jinx-toggle\">관련 징크스 <span class=\"jinxes__toggle\">(열기)</span></span>";
+            html += "<table hidden>" + related.map(function (jinx) {
+                return "<tr><td><img class=\"jinx-icon\" src=\"" + W.iconUrl(esc(jinx.with)) + "\" alt=\"\"></td>" +
+                    "<td><p class=\"jinx-name\">" + roleLabel(jinx.with) + "</p>" +
+                    "<p class=\"jinx-reason\">" + esc(jinx.reason) + "</p></td></tr>";
+            }).join("") + "</table></div>";
+        }
+
+        guide.sections.forEach(function (section) {
+            html += "<section class=\"section\"><h2>" + rich(section.title, self) + "</h2>";
+            html += section.blocks.map(function (block) {
+                return renderBlock(block, self);
+            }).join("");
+            html += "</section>";
+        });
+
+        html += "<div class=\"credit\">이 페이지는 Blood on the Clocktower 공식 위키 문서(판 " + esc(guide.source.oldid) +
+            ", " + esc(guide.source.lastEdited) + " 수정)를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 페이지입니다. " +
+            "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(guide.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
+
+        page.innerHTML = html;
+
+        var jinxToggle = document.getElementById("jinx-toggle");
+        if (jinxToggle) {
+            jinxToggle.addEventListener("click", function () {
+                var table = document.querySelector("#jinxes table");
+                table.hidden = !table.hidden;
+                jinxToggle.querySelector(".jinxes__toggle").textContent = table.hidden ? "(열기)" : "(닫기)";
+            });
+        }
+
+        window.scrollTo(0, 0);
+
+    }
+
+    function notFound() {
+        page.innerHTML = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>" +
+            "<div class=\"notfound\"><h2>번역 준비 중</h2><p>이 캐릭터의 가이드는 아직 번역 중입니다.</p></div>";
+    }
+
+    if (!id) {
+        notFound();
+        return;
+    }
+
+    Promise.all([
+        W.getJSON("guide/data/roles.json"),
+        W.getJSON("guide/data/index.json").catch(function () { return []; }),
+        W.getJSON("guide/data/jinxes.json").catch(function () { return {}; }),
+        W.getJSON("guide/data/catalog.json").catch(function () { return []; })
+    ])
+        .then(function (data) {
+            roles = data[0];
+            translated = Array.isArray(data[1]) ? data[1] : [];
+            jinxes = data[2] || {};
+            catalog = Array.isArray(data[3]) ? data[3] : [];
+            return W.getJSON("guide/data/chars/" + id + ".json");
+        })
+        .then(function (guide) {
+            if (!roles[guide.id]) {
+                throw new Error("캐릭터 없음");
+            }
+            render(guide);
+        })
+        .catch(notFound);
+
+}());
+</script>
+</body>
+</html>

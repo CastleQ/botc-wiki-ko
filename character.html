@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<!-- c/<id>.html(캐릭터별 복사본)에서도 style.css·common.js·링크가 사이트 뿌리 기준으로 풀리도록 -->
+<base href="/botc-wiki-ko/">
+<!-- OG -->
 <title>BOTC Wiki 한글번역 페이지</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,8 +109,10 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         EDITIONS[edition.id] = edition;
     });
 
+    // 캐릭터 id: c/<id>.html(오픈그래프가 들어간 캐릭터별 페이지) 주소, 또는 예전 주소 character.html?id=<id>
     var params = new URLSearchParams(window.location.search);
-    var id = (params.get("id") || "").replace(/[^a-z_]/g, "");
+    var pathMatch = window.location.pathname.match(/\/c\/([a-z_]+)\.html$/);
+    var id = ((pathMatch && pathMatch[1]) || params.get("id") || "").replace(/[^a-z_]/g, "");
     var page = document.getElementById("page");
     var roles = {};
     var translated = [];
