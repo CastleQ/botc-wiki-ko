@@ -26,6 +26,11 @@
 
     var W = window.WikiKo;
     var key = new URLSearchParams(window.location.search).get("p") || "";
+    // 완성되어 옮겨 간 문서의 옛 주소
+    if (key === "experimental") {
+        window.location.replace("type.html?id=experimental");
+        return;
+    }
     var title = Object.prototype.hasOwnProperty.call(W.WIP_PAGES, key) ? W.WIP_PAGES[key] : "준비 중인 문서";
 
     document.title = title + " — BOTC Wiki 한글번역 페이지";

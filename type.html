@@ -29,12 +29,14 @@
     var esc = W.esc;
     var page = document.getElementById("page");
     var id = new URLSearchParams(window.location.search).get("id") || "";
-    var name = Object.prototype.hasOwnProperty.call(W.TEAM_NAMES, id) ? W.TEAM_NAMES[id] : "";
+    // "experimental"은 유형이 아니라 위키 Experimental 문서(유형별 묶음)다.
+    var name = id === "experimental" ? W.EXPERIMENTAL_NAME :
+        (Object.prototype.hasOwnProperty.call(W.TEAM_NAMES, id) ? W.TEAM_NAMES[id] : "");
 
     // 위키 설명글이 있는 유형(여행자·전설·설화)은 위키 문서와 같이: 제목 → 소개글 → 목차 → 진행 방법 → 묶음별 격자.
     // 소개글이 없는 유형은 캐릭터 수 한 줄 → 묶음별 격자.
     function render(catalog, story) {
-        var sections = W.typeSections(catalog, id);
+        var sections = id === "experimental" ? W.experimentalSections(catalog) : W.typeSections(catalog, id);
         var count = sections.reduce(function (sum, section) {
             return sum + section.entries.length;
         }, 0);

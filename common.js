@@ -42,7 +42,7 @@
     ];
 
     // 위키 소개글 번역이 있는 유형 (PG+ guide/data/pages/<유형>.json). 없는 유형은 요청하지 않는다.
-    var TYPE_PAGES = ["traveller", "fabled", "loric"];
+    var TYPE_PAGES = ["traveller", "fabled", "loric", "experimental"];
 
     // 위키 Loric 문서의 순서. 여기에 없는 새 설화는 맨 뒤(가나다순)로 간다.
     var LORIC_ORDER = ["bigwig", "bootlegger", "gardener", "godofug", "hindu", "knaves", "pope", "stormcatcher", "tor", "ventriloquist", "zenomancer"];
@@ -52,6 +52,18 @@
         { title: "사회적 상호작용 & 접근성", ids: ["angel", "buddhist", "doomsayer", "fiddler", "hellslibrarian", "revolutionary", "toymaker"] },
         { title: "커스텀 스크립트", ids: ["djinn", "duchess", "fibbin", "sentinel", "spiritofivory"] },
         { title: "실험", ids: ["deusexfiasco", "ferryman"] }
+    ];
+
+    // 위키 Experimental 문서의 유형별 목록 (판 3071). 유형 순서와 목록은 위키 그대로, 유형 안은 영어 이름 ABC순(= id 순).
+    // catalog의 판 표시(edition)만으로는 고를 수 없다 — 전설은 전부 exp로 되어 있고, 위키에 없는 exp 악마도 있다.
+    var EXPERIMENTAL = [
+        { team: "townsfolk", ids: ["acrobat", "alchemist", "alsaahir", "amnesiac", "atheist", "balloonist", "banshee", "bountyhunter", "cannibal", "choirboy", "cultleader", "engineer", "farmer", "fisherman", "general", "highpriestess", "huntsman", "king", "knight", "lycanthrope", "magician", "nightwatchman", "noble", "pixie", "poppygrower", "preacher", "princess", "shugenja", "steward", "villageidiot"] },
+        { team: "outsider", ids: ["damsel", "golem", "hatter", "heretic", "hermit", "ogre", "plaguedoctor", "politician", "puzzlemaster", "snitch", "zealot"] },
+        { team: "minion", ids: ["boffin", "boomdandy", "fearmonger", "goblin", "harpy", "marionette", "mezepheles", "organgrinder", "psychopath", "summoner", "vizier", "widow", "wizard", "wraith", "xaan"] },
+        { team: "demon", ids: ["alhadikhia", "kazali", "legion", "leviathan", "lilmonsta", "lleech", "lordoftyphon", "ojo"] },
+        { team: "fabled", ids: ["deusexfiasco", "ferryman"] },
+        { team: "loric", ids: ["bigwig", "bootlegger", "gardener", "godofug", "hindu", "knaves", "pope", "stormcatcher", "tor", "ventriloquist", "zenomancer"] },
+        { team: "traveller", ids: ["cacklejack", "gangster", "gnome"] }
     ];
 
     function esc(text) {
@@ -174,6 +186,23 @@
         return sections;
     }
 
+    // 실험 캐릭터 페이지: 위키 유형 순서대로, 유형 안은 위키 순서 (catalog에 없는 id는 건너뛴다)
+    function experimentalSections(catalog) {
+        var byId = indexById(catalog);
+        return EXPERIMENTAL.map(function (group) {
+            return {
+                title: TEAM_NAMES[group.team],
+                entries: group.ids.filter(function (id) {
+                    return byId[id];
+                }).map(function (id) {
+                    return byId[id];
+                })
+            };
+        }).filter(function (section) {
+            return section.entries.length;
+        });
+    }
+
     function flatten(sections) {
         return sections.reduce(function (all, section) {
             return all.concat(section.entries);
@@ -274,7 +303,6 @@
         "states": "상태",
         "teensyville": "틴시빌",
         "script-tool": "스크립트 도구",
-        "experimental": "실험 캐릭터",
         "recent-changes": "최근 바뀜",
         "random": "임의 문서"
     };
@@ -303,6 +331,8 @@
         indexById: indexById,
         editionSections: editionSections,
         typeSections: typeSections,
+        experimentalSections: experimentalSections,
+        EXPERIMENTAL_NAME: "실험 캐릭터",
         homeOf: homeOf,
         notFoundHtml: notFoundHtml,
         WIP_PAGES: WIP_PAGES
@@ -319,7 +349,7 @@
                 return [edition.name, "edition.html?id=" + edition.id];
             }).concat(["traveller", "fabled", "loric"].map(function (team) {
                 return [TEAM_NAMES[team], "type.html?id=" + team];
-            })).concat(["experimental"]) },
+            })).concat([["실험 캐릭터", "type.html?id=experimental"]]) },
             { title: "둘러보기", items: ["recent-changes", "random"] }
         ];
         var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;
