@@ -272,7 +272,13 @@
         "Glossary": "doc.html?p=glossary",
         "Storyteller_Advice": "doc.html?p=storyteller-advice",
         "Player_Strategy": "doc.html?p=player-strategy",
-        "Changelog": "doc.html?p=changelog"
+        "Changelog": "doc.html?p=changelog",
+        "Setup": "doc.html?p=setup",
+        "Rules_Explanation": "doc.html?p=rules",
+        "Abilities": "doc.html?p=abilities",
+        "States": "doc.html?p=states",
+        "Teensyville": "doc.html?p=teensyville",
+        "Script_Tool": "doc.html?p=script-tool"
     };
     function linkHtml(label, target) {
         if (/^https?:\/\//.test(target)) {
@@ -281,7 +287,9 @@
         var page = target.replace(/^wiki:/, "").replace(/&amp;/g, "&");
         var local = WIKI_LINKS[page.split("#")[0]];
         if (local) {
-            return "<a href=\"" + local + "\">" + label + "</a>";
+            // 문서 안 제목(#Drunkenness_and_Poisoning)은 이 사이트 제목 id 규칙(소문자·하이픈)으로
+            var hash = page.split("#")[1];
+            return "<a href=\"" + local + (hash ? "#" + hash.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "") + "\">" + label + "</a>";
         }
         return "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(page) + "\" target=\"_blank\" rel=\"noopener\">" + label + "</a>";
     }
@@ -323,12 +331,6 @@
 
     // 아직 만들지 않은 위키 문서 (왼쪽 메뉴에서 wip.html?p=<키>로 연결)
     var WIP_PAGES = {
-        "setup": "게임 준비",
-        "rules": "규칙 설명",
-        "abilities": "능력",
-        "states": "상태",
-        "teensyville": "틴시빌",
-        "script-tool": "스크립트 도구",
         "recent-changes": "최근 바뀜",
         "random": "임의 문서"
     };
@@ -338,7 +340,18 @@
         "glossary": { title: "용어집" },
         "storyteller-advice": { title: "이야기꾼 조언" },
         "player-strategy": { title: "플레이어 전략" },
-        "changelog": { title: "변경 이력", tocLevels: 2 }
+        "changelog": { title: "변경 이력", tocLevels: 2 },
+        "setup": { title: "게임 준비" },
+        "rules": { title: "규칙 설명" },
+        "abilities": { title: "능력" },
+        "states": { title: "상태" },
+        "teensyville": { title: "틴시빌" },
+        "script-tool": { title: "스크립트 도구" }
+    };
+    // 왼쪽 메뉴 묶음
+    var DOC_GROUPS = {
+        "게임 정보": ["glossary", "storyteller-advice", "player-strategy", "changelog"],
+        "규칙서": ["setup", "rules", "abilities", "states", "teensyville", "script-tool"]
     };
 
     function notFoundHtml(title, text) {
@@ -376,12 +389,16 @@
     // ── 왼쪽 메뉴 (공식 위키 pivot 스킨의 사이드바) ──
     // 넓은 화면(1024px 이상)에서만 보인다. 좁은 화면은 위쪽 보라색 막대를 그대로 쓴다.
     // 아직 만들지 않은 문서는 wip.html?p=<키> ("아직 작업 중 이에요 :)")로 보낸다.
+    function docItems(group) {
+        return DOC_GROUPS[group].map(function (key) {
+            return [DOCS[key].title, "doc.html?p=" + key];
+        });
+    }
+
     function mountSidebar() {
         var menu = [
-            { title: "게임 정보", items: Object.keys(DOCS).map(function (key) {
-                return [DOCS[key].title, "doc.html?p=" + key];
-            }) },
-            { title: "규칙서", items: ["setup", "rules", "abilities", "states", "teensyville", "script-tool"] },
+            { title: "게임 정보", items: docItems("게임 정보") },
+            { title: "규칙서", items: docItems("규칙서") },
             { title: "캐릭터", items: EDITIONS.map(function (edition) {
                 return [edition.name, "edition.html?id=" + edition.id];
             }).concat(["traveller", "fabled", "loric"].map(function (team) {

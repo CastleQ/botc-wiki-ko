@@ -34,6 +34,30 @@
 .doc a.role--traveller { color: #7d2182; }
 .doc a.role--fabled { color: #c9971c; }
 .doc a.role--loric { color: #3f8a36; }
+/* 위키 예시 상자 (캐릭터 페이지와 같은 모양) */
+.example {
+    position: relative;
+    width: 78%;
+    margin: 24px auto;
+    padding: 20px 16px;
+    border: 1px solid var(--wiki-border);
+    background-color: rgba(255, 255, 255, 0.45);
+    text-align: center;
+    font-size: 15px;
+    color: #222;
+}
+.example p { margin: 0; }
+.example p + p { margin-top: 1em; }
+.example::before, .example::after {
+    content: " ";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: url("/pocket-grimoire/guide/img/frame.png") center no-repeat;
+}
+.example::before { left: -31px; transform: rotateY(180deg); }
+.example::after { right: -31px; }
 #toc .toclevel-2 { margin-left: 1.2em; }
 #toc .toclevel-3 { margin-left: 2.4em; }
 </style>
@@ -57,6 +81,9 @@
     function blockHtml(block, byId) {
         if (block.p !== undefined) {
             return "<p>" + W.richText(block.p, byId) + "</p>";
+        }
+        if (block.example !== undefined) {
+            return "<div class=\"example\"><p>" + W.richText(block.example, byId) + "</p></div>";
         }
         if (block.ul) {
             return "<ul>" + block.ul.map(function (item) {
@@ -111,9 +138,10 @@
                 var tag = "h" + Math.min(section.level + 1, 4);
                 html += "<" + tag + " id=\"" + esc(section.key) + "\">" + W.richText(section.title, byId) + "</" + tag + ">";
             }
+            // 이어진 예시 문단은 위키처럼 상자 하나에 담는다
             html += section.blocks.map(function (block) {
                 return blockHtml(block, byId);
-            }).join("");
+            }).join("").replace(/<\/p><\/div><div class="example"><p>/g, "</p><p>");
         });
         html += "</div>";
         html += "<div class=\"credit\">이 페이지는 Blood on the Clocktower 공식 위키 문서(판 " + esc(data.source.oldid) +
