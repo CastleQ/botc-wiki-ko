@@ -55,12 +55,12 @@
     ];
 
     // 위키 Experimental 문서의 유형별 목록 (판 3071). 유형 순서와 목록은 위키 그대로, 유형 안은 영어 이름 ABC순(= id 순).
-    // catalog의 판 표시(edition)만으로는 고를 수 없다 — 전설은 전부 exp로 되어 있고, 위키에 없는 exp 악마도 있다.
+    // catalog의 판 표시(edition)만으로는 고를 수 없다 — 전설은 전부 exp로 되어 있다.
     var EXPERIMENTAL = [
         { team: "townsfolk", ids: ["acrobat", "alchemist", "alsaahir", "amnesiac", "atheist", "balloonist", "banshee", "bountyhunter", "cannibal", "choirboy", "cultleader", "engineer", "farmer", "fisherman", "general", "highpriestess", "huntsman", "king", "knight", "lycanthrope", "magician", "nightwatchman", "noble", "pixie", "poppygrower", "preacher", "princess", "shugenja", "steward", "villageidiot"] },
         { team: "outsider", ids: ["damsel", "golem", "hatter", "heretic", "hermit", "ogre", "plaguedoctor", "politician", "puzzlemaster", "snitch", "zealot"] },
         { team: "minion", ids: ["boffin", "boomdandy", "fearmonger", "goblin", "harpy", "marionette", "mezepheles", "organgrinder", "psychopath", "summoner", "vizier", "widow", "wizard", "wraith", "xaan"] },
-        { team: "demon", ids: ["alhadikhia", "kazali", "legion", "leviathan", "lilmonsta", "lleech", "lordoftyphon", "ojo"] },
+        { team: "demon", ids: ["alhadikhia", "kazali", "legion", "leviathan", "lilmonsta", "lleech", "lordoftyphon", "ojo", "riot", "yaggababble"] },
         { team: "fabled", ids: ["deusexfiasco", "ferryman"] },
         { team: "loric", ids: ["bigwig", "bootlegger", "gardener", "godofug", "hindu", "knaves", "pope", "stormcatcher", "tor", "ventriloquist", "zenomancer"] },
         { team: "traveller", ids: ["cacklejack", "gangster", "gnome"] }
