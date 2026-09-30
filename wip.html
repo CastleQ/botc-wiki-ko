@@ -31,6 +31,10 @@
         window.location.replace("type.html?id=experimental");
         return;
     }
+    if (Object.prototype.hasOwnProperty.call(W.DOCS, key)) {
+        window.location.replace("doc.html?p=" + key);
+        return;
+    }
     var title = Object.prototype.hasOwnProperty.call(W.WIP_PAGES, key) ? W.WIP_PAGES[key] : "준비 중인 문서";
 
     document.title = title + " — BOTC Wiki 한글번역 페이지";

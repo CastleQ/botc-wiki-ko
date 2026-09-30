@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>BOTC Wiki 한글번역 페이지</title>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* 위키 일반 문서 (용어집·이야기꾼 조언·플레이어 전략·변경 이력) — 위키 문서처럼 제목 → 머리글 → 목차 → 제목 단계별 본문.
+   제목 단계: 문서에서 가장 큰 제목(level 1)이 h2, 그 아래가 h3·h4. */
+.doc { margin-top: 0.8em; }
+.doc h3 {
+    font-family: "KookminUniversitySunggokSerif", serif;
+    font-weight: normal;
+    font-size: 18px;
+    color: var(--wiki-maroon);
+    margin: 1.1em 0 0.3em;
+}
+.doc h4 { font-size: 15px; color: #000; margin: 0.9em 0 0.2em; }
+.doc ul { margin: 0 0 1em; padding-left: 1.4em; }
+.doc li { margin-bottom: 0.5em; }
+.doc li ul { margin: 0.4em 0 0; }
+.doc a { color: #2a5aa0; text-decoration: none; }
+.doc a:hover { text-decoration: underline; }
+.doc a.role--good { color: var(--good); }
+.doc a.role--evil { color: var(--evil); }
+.doc a.role--traveller { color: #7d2182; }
+.doc a.role--fabled { color: #c9971c; }
+.doc a.role--loric { color: #3f8a36; }
+#toc .toclevel-2 { margin-left: 1.2em; }
+#toc .toclevel-3 { margin-left: 2.4em; }
+</style>
+</head>
+<body>
+<nav class="tab-bar">
+    <a href="./">BOTC Wiki 한글번역 페이지</a>
+</nav>
+<main class="page" id="page"></main>
+
+<script src="common.js"></script>
+<script>
+(function () {
+
+    var W = window.WikiKo;
+    var esc = W.esc;
+    var page = document.getElementById("page");
+    var key = new URLSearchParams(window.location.search).get("p") || "";
+    var doc = Object.prototype.hasOwnProperty.call(W.DOCS, key) ? W.DOCS[key] : null;
+
+    function blockHtml(block, byId) {
+        if (block.p !== undefined) {
+            return "<p>" + W.richText(block.p, byId) + "</p>";
+        }
+        if (block.ul) {
+            return "<ul>" + block.ul.map(function (item) {
+                if (typeof item === "string") {
+                    return "<li>" + W.richText(item, byId) + "</li>";
+                }
+                return "<li>" + W.richText(item.t, byId) + "<ul>" + item.ul.map(function (sub) {
+                    return "<li>" + W.richText(sub, byId) + "</li>";
+                }).join("") + "</ul></li>";
+            }).join("") + "</ul>";
+        }
+        return "";
+    }
+
+    // 미디어위키 목차: 제목이 4개 이상일 때, 단계별로 1 / 1.1 / 1.1.1 번호
+    function tocHtml(sections, byId) {
+        var maxLevel = doc.tocLevels || 3;
+        var titled = sections.filter(function (section) {
+            return section.level > 0;
+        });
+        if (titled.length < 4) {
+            return "";
+        }
+        var counters = [];
+        var html = "<nav id=\"toc\"><div class=\"toctitle\">목차</div><ol>";
+        titled.forEach(function (section) {
+            if (section.level > maxLevel) {
+                return;
+            }
+            counters = counters.slice(0, section.level);
+            counters[section.level - 1] = (counters[section.level - 1] || 0) + 1;
+            html += "<li class=\"toclevel-" + section.level + "\"><a href=\"#" + esc(section.key) + "\"><span class=\"tocnumber\">" + counters.join(".") + "</span>" +
+                W.richText(section.title, byId).replace(/<a [^>]*>|<\/a>/g, "") + "</a></li>";
+        });
+        return html + "</ol></nav>";
+    }
+
+    function render(catalog, data) {
+        var byId = W.indexById(catalog);
+        var html = "<nav class=\"crumbs\"><a href=\"./\">← 메인으로</a></nav>";
+        var tocShown = false;
+
+        document.title = doc.title + " — BOTC Wiki 한글번역 페이지";
+        html += "<h1 class=\"title\">" + esc(doc.title) + "</h1><div class=\"doc wiki-text\">";
+        data.sections.forEach(function (section) {
+            // 목차는 위키처럼 첫 제목 바로 앞
+            if (section.level > 0 && !tocShown) {
+                html += tocHtml(data.sections, byId);
+                tocShown = true;
+            }
+            if (section.level > 0) {
+                var tag = "h" + Math.min(section.level + 1, 4);
+                html += "<" + tag + " id=\"" + esc(section.key) + "\">" + W.richText(section.title, byId) + "</" + tag + ">";
+            }
+            html += section.blocks.map(function (block) {
+                return blockHtml(block, byId);
+            }).join("");
+        });
+        html += "</div>";
+        html += "<div class=\"credit\">이 페이지는 Blood on the Clocktower 공식 위키 문서(판 " + esc(data.source.oldid) +
+            ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
+            "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(data.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
+        page.innerHTML = html;
+
+        // 주소에 #제목이 있으면 그 자리로 (본문을 나중에 그리므로 직접 옮긴다)
+        if (window.location.hash) {
+            var target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+            if (target) {
+                target.scrollIntoView();
+            }
+        }
+    }
+
+    if (!doc) {
+        page.innerHTML = W.notFoundHtml("없는 문서", "왼쪽 메뉴나 메인에서 다시 골라 주세요.") + W.CREDIT;
+        return;
+    }
+
+    Promise.all([
+        W.getJSON("guide/data/catalog.json"),
+        W.getJSON("guide/data/pages/" + key + ".json")
+    ])
+        .then(function (data) {
+            render(data[0], data[1]);
+        })
+        .catch(function () {
+            page.innerHTML = W.notFoundHtml("문서를 불러오지 못했습니다", "잠시 뒤 다시 열어 주세요.") + W.CREDIT;
+        });
+
+}());
+</script>
+</body>
+</html>

@@ -260,11 +260,41 @@
         }).join("") + "</ul>";
     }
 
-    // 번역문 표기: {c:id} → 캐릭터 링크(선 파랑 / 악 빨강, 정발 이름), **굵게** → 굵은 글씨.
-    // byId는 catalog를 id로 찾을 수 있게 만든 표. 목록에 없는 id는 글자 그대로 둔다.
+    // 위키 문서 링크 [글자](wiki:문서) → 이 사이트에 있는 문서는 이 사이트로, 없는 문서는 원문 위키로
+    var WIKI_LINKS = {
+        "Fabled": "type.html?id=fabled",
+        "Travellers": "type.html?id=traveller",
+        "Loric": "type.html?id=loric",
+        "Experimental": "type.html?id=experimental",
+        "Trouble_Brewing": "edition.html?id=tb",
+        "Bad_Moon_Rising": "edition.html?id=bmr",
+        "Sects_&_Violets": "edition.html?id=snv",
+        "Glossary": "doc.html?p=glossary",
+        "Storyteller_Advice": "doc.html?p=storyteller-advice",
+        "Player_Strategy": "doc.html?p=player-strategy",
+        "Changelog": "doc.html?p=changelog"
+    };
+    function linkHtml(label, target) {
+        if (/^https?:\/\//.test(target)) {
+            return "<a href=\"" + target + "\" target=\"_blank\" rel=\"noopener\">" + label + "</a>";
+        }
+        var page = target.replace(/^wiki:/, "").replace(/&amp;/g, "&");
+        var local = WIKI_LINKS[page.split("#")[0]];
+        if (local) {
+            return "<a href=\"" + local + "\">" + label + "</a>";
+        }
+        return "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(page) + "\" target=\"_blank\" rel=\"noopener\">" + label + "</a>";
+    }
+
+    // 번역문 표기: {c:id} → 캐릭터 링크(선 파랑 / 악 빨강, 정발 이름), **굵게** → 굵은 글씨, __기울임__ → 기울임,
+    // [글자](wiki:문서 또는 https://주소) → 링크. byId는 catalog를 id로 찾을 수 있게 만든 표. 목록에 없는 id는 글자 그대로 둔다.
     function richText(text, byId) {
         return esc(text)
             .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+            .replace(/__(.+?)__/g, "<i>$1</i>")
+            .replace(/\[([^\]]+)\]\(((?:wiki:|https?:\/\/)[^)\s]+)\)/g, function (all, label, target) {
+                return linkHtml(label, target);
+            })
             .replace(/\{c:([a-z_]+)\}/g, function (all, roleId) {
                 var entry = byId[roleId];
                 if (!entry) {
@@ -293,10 +323,6 @@
 
     // 아직 만들지 않은 위키 문서 (왼쪽 메뉴에서 wip.html?p=<키>로 연결)
     var WIP_PAGES = {
-        "glossary": "용어집",
-        "storyteller-advice": "이야기꾼 조언",
-        "player-strategy": "플레이어 전략",
-        "changelog": "변경 이력",
         "setup": "게임 준비",
         "rules": "규칙 설명",
         "abilities": "능력",
@@ -305,6 +331,14 @@
         "script-tool": "스크립트 도구",
         "recent-changes": "최근 바뀜",
         "random": "임의 문서"
+    };
+
+    // 위키 일반 문서 (doc.html?p=<키>). 번역은 PG+ guide/data/pages/<키>.json. tocLevels는 목차에 넣을 제목 단계 수
+    var DOCS = {
+        "glossary": { title: "용어집" },
+        "storyteller-advice": { title: "이야기꾼 조언" },
+        "player-strategy": { title: "플레이어 전략" },
+        "changelog": { title: "변경 이력", tocLevels: 2 }
     };
 
     function notFoundHtml(title, text) {
@@ -335,7 +369,8 @@
         EXPERIMENTAL_NAME: "실험 캐릭터",
         homeOf: homeOf,
         notFoundHtml: notFoundHtml,
-        WIP_PAGES: WIP_PAGES
+        WIP_PAGES: WIP_PAGES,
+        DOCS: DOCS
     };
 
     // ── 왼쪽 메뉴 (공식 위키 pivot 스킨의 사이드바) ──
@@ -343,7 +378,9 @@
     // 아직 만들지 않은 문서는 wip.html?p=<키> ("아직 작업 중 이에요 :)")로 보낸다.
     function mountSidebar() {
         var menu = [
-            { title: "게임 정보", items: ["glossary", "storyteller-advice", "player-strategy", "changelog"] },
+            { title: "게임 정보", items: Object.keys(DOCS).map(function (key) {
+                return [DOCS[key].title, "doc.html?p=" + key];
+            }) },
             { title: "규칙서", items: ["setup", "rules", "abilities", "states", "teensyville", "script-tool"] },
             { title: "캐릭터", items: EDITIONS.map(function (edition) {
                 return [edition.name, "edition.html?id=" + edition.id];
