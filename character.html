@@ -18,14 +18,8 @@
 <style>
 /* 캐릭터 페이지 — 포켓 그리모어 플러스+의 public/guide.html을 복사해 고친 것.
    도감에는 가림막이 없고, 데이터는 PG+ 배포본(/pocket-grimoire/guide/data/)을 읽는다. */
-#tagline {
-    font-family: "Sanhayeop", serif;
-    font-style: italic;
-    font-size: 15px;
-    color: #959595;
-    margin: 0.2em 0 1em;
-    font-weight: normal;
-}
+/* 캐릭터 이름: 공용 제목(36px)보다 약 20% 크게 */
+h1.title { font-size: 43px; margin-bottom: 0.4em; }
 #character-details {
     background-color: rgba(255, 255, 255, 0.75);
     border: 1px solid var(--wiki-border);
@@ -39,7 +33,7 @@
 #character-details td { padding: 0.55em 0.6em; }
 #character-details tr:nth-child(odd) { background: #fff; }
 #character-details tr:nth-child(even) { background: #f7f5f2; }
-p.flavour { font-size: 16px; color: #000; font-style: italic; padding: 12px 32px 0; }
+p.flavour { font-family: "Sanhayeop", serif; font-size: 16px; color: #000; font-style: italic; padding: 12px 32px 0; }
 .edition-logo { width: 100px; height: 100px; }
 .podcast-by { display: block; color: #000; font-size: 14px; }
 audio { width: 90%; margin: 0.5em 0 10px; }
@@ -207,7 +201,6 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         document.title = self.name + " — BOTC Wiki 한글번역 페이지";
 
         html += "<h1 class=\"title\">" + esc(self.name) + "</h1>";
-        html += "<h3 id=\"tagline\">시계탑에 흐른 피 위키에서</h3>";
 
         html += "<div class=\"char-layout\"><aside class=\"char-aside\">";
         html += "<div id=\"character-details\">";
