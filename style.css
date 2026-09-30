@@ -14,6 +14,13 @@
     font-weight: 400;
     font-display: swap;
 }
+/* 이야기풍 문장 글꼴(캐릭터 제목 아래 한 줄, 에디션 줄거리): 산하엽 Diphylleia (눈누 배포, jsDelivr) */
+@font-face {
+    font-family: "Sanhayeop";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_JAMO@1.0/Diphylleia-Regular.woff2") format("woff2");
+    font-weight: normal;
+    font-display: swap;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
