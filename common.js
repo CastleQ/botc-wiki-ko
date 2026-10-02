@@ -404,7 +404,7 @@
             }).concat(["traveller", "fabled", "loric"].map(function (team) {
                 return [TEAM_NAMES[team], "type.html?id=" + team];
             })).concat([["실험 캐릭터", "type.html?id=experimental"]]) },
-            { title: "둘러보기", items: ["recent-changes", "random"] }
+            { title: "둘러보기", items: ["recent-changes", "random", ["오역 제보 및 기타문의", "https://open.kakao.com/o/smyEIE4"]] }
         ];
         var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;
         var html = "<a class=\"sidebar__logo\" href=\"./\"><img src=\"" + BASE + "guide/img/logo.png\" alt=\"Blood on the Clocktower\"></a>" +
@@ -414,7 +414,9 @@
             html += "<div class=\"sidebar__label\">" + esc(group.title) + "</div><ul>" + group.items.map(function (item) {
                 var label = Array.isArray(item) ? item[0] : WIP_PAGES[item];
                 var href = Array.isArray(item) ? item[1] : "wip.html?p=" + item;
-                return "<li><a href=\"" + href + "\"" + (href === here ? " aria-current=\"page\"" : "") + ">" + esc(label) + "</a></li>";
+                // 바깥 주소(오픈채팅 등)는 새 창으로
+                var external = /^https?:\/\//.test(href) ? " target=\"_blank\" rel=\"noopener\"" : "";
+                return "<li><a href=\"" + href + "\"" + external + (href === here ? " aria-current=\"page\"" : "") + ">" + esc(label) + "</a></li>";
             }).join("") + "</ul>";
         });
         var aside = document.createElement("aside");
