@@ -425,6 +425,46 @@
         if (params.get("q")) {
             aside.querySelector("#side-search").value = params.get("q");
         }
+        mountMenuToggle(aside);
+    }
+
+    // ── 좁은 화면: 위쪽 막대 왼쪽 햄버거 버튼 → 왼쪽 메뉴가 밀려 들어옴 (공식 위키 pivot 스킨의 off-canvas) ──
+    // 열리면 본문이 오른쪽으로 밀리고, 본문 위 반투명 막을 누르거나 Esc를 누르면 닫힌다. 넓은 화면에서는 버튼이 보이지 않는다.
+    function mountMenuToggle(aside) {
+        var bar = document.querySelector(".tab-bar");
+        if (!bar) {
+            return;
+        }
+        aside.id = "site-menu";
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "menu-toggle";
+        button.setAttribute("aria-controls", "site-menu");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "메뉴 열기");
+        button.innerHTML = "<span></span>";
+        bar.insertBefore(button, bar.firstChild);
+        var overlay = document.createElement("div");
+        overlay.className = "menu-overlay";
+        document.body.appendChild(overlay);
+
+        function setOpen(open) {
+            document.body.classList.toggle("menu-open", open);
+            button.setAttribute("aria-expanded", open ? "true" : "false");
+            button.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+        }
+        button.addEventListener("click", function () {
+            setOpen(!document.body.classList.contains("menu-open"));
+        });
+        overlay.addEventListener("click", function () {
+            setOpen(false);
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && document.body.classList.contains("menu-open")) {
+                setOpen(false);
+                button.focus();
+            }
+        });
     }
 
     mountSidebar();

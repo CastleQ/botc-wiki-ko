@@ -178,6 +178,67 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
    위키 값: 메뉴는 화면 폭 1/6(large-2), 보라 배경 위 흰 글씨 14px, 묶음 제목은 굵게 + 위아래 장식선(divider.png).
    본문 양피지는 메뉴 오른쪽을 꽉 채우고 위에서 조금 떨어져 시작한다. 좁은 화면은 위쪽 막대를 그대로 쓴다. */
 .sidebar { display: none; }
+.menu-toggle, .menu-overlay { display: none; }
+/* 좁은 화면: 햄버거 버튼 + 밀려 들어오는 메뉴 (위키 off-canvas 값: 폭 15.625rem, 500ms, 본문 위 막 rgba(255,255,255,.2)) */
+@media (max-width: 1023.98px) {
+    html, body { overflow-x: hidden; }
+    .tab-bar { position: relative; padding-left: 52px; padding-right: 52px; }
+    .menu-toggle {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 45px;
+        height: 45px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+    }
+    .menu-toggle span::after {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        width: 16px;
+        height: 0;
+        margin-top: -8px;
+        box-shadow: 0 0 0 1px #fff, 0 7px 0 1px #fff, 0 14px 0 1px #fff;
+    }
+    .menu-toggle:hover span::after, .menu-toggle:focus-visible span::after { box-shadow: 0 0 0 1px #b3b3b3, 0 7px 0 1px #b3b3b3, 0 14px 0 1px #b3b3b3; }
+    .sidebar {
+        display: block;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 15.625rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 1003;
+        padding: 16px 12px 32px;
+        color: #fff;
+        background: #2b1633 url("/pocket-grimoire/guide/img/background.webp") center / cover;
+        transform: translate3d(-100%, 0, 0);
+        visibility: hidden;
+        transition: transform 500ms ease, visibility 0s linear 500ms;
+    }
+    .tab-bar, .page { transition: transform 500ms ease; }
+    .menu-open .sidebar { transform: none; visibility: visible; transition: transform 500ms ease; }
+    .menu-open .tab-bar, .menu-open .page { transform: translate3d(15.625rem, 0, 0); }
+    .menu-open .menu-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1002;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: -4px 0 4px rgba(0, 0, 0, 0.5), 4px 0 4px rgba(0, 0, 0, 0.5);
+        -webkit-tap-highlight-color: transparent;
+    }
+}
 @media (min-width: 1024px) {
     body { display: grid; grid-template-columns: minmax(200px, 16.6667%) minmax(0, 1fr); align-items: start; }
     .tab-bar { display: none; }
