@@ -103,6 +103,30 @@ a.role, span.role { font-weight: bold; text-decoration: none; }
 .crumbs__steps a { font-weight: normal; }
 .lead { font-size: 15px; color: #222; margin: 0.6em 0 1em; }
 
+/* 캐릭터 이름 호버창 — 공식 위키 [data-role] 값 그대로 (폭 300px, 흰 바탕 95%, 둥근 모서리 10px, #BDA89A 테두리, 0.15초 동안 27px 아래로) */
+[data-ability] { position: relative; display: inline-block; }
+[data-ability]:not([data-ability=""])::before {
+    content: attr(data-ability);
+    position: absolute;
+    opacity: 0;
+    transition: all 0.15s ease;
+    left: 50%;
+    margin-left: -150px;
+    padding: 10px;
+    text-align: center;
+    color: #5C1F22;
+    width: 300px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px #BDA89A solid;
+    z-index: 9999;
+    pointer-events: none;
+}
+[data-ability]:hover::before { opacity: 1; margin-top: 27px; }
+
 /* 위키 목차 상자 (#toc) — 에디션·유형 페이지 공용 */
 #toc {
     display: inline-block;

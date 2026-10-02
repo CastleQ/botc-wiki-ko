@@ -146,9 +146,9 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         }
         var side = W.side(role.team);
         if (roleId === id || translated.indexOf(roleId) === -1) {
-            return "<span class=\"role role--" + side + "\">" + esc(role.name) + "</span>";
+            return "<span class=\"role role--" + side + "\" data-id=\"" + esc(roleId) + "\">" + esc(role.name) + "</span>";
         }
-        return "<a class=\"role role--" + side + "\" href=\"" + W.pageUrl(roleId) + "\">" + esc(role.name) + "</a>";
+        return "<a class=\"role role--" + side + "\" href=\"" + W.pageUrl(roleId) + "\" data-id=\"" + esc(roleId) + "\">" + esc(role.name) + "</a>";
     }
 
     function rich(text, self) {

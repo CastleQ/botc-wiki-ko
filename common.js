@@ -256,7 +256,7 @@
     function grid(entries) {
         return "<ul class=\"grid\">" + entries.map(function (entry) {
             return "<li><a class=\"role--" + side(entry.team) + "\" href=\"" + pageUrl(entry.id) + "\">" +
-                "<img src=\"" + iconUrl(entry.id) + "\" alt=\"\" loading=\"lazy\">" + esc(entry.name) + "</a></li>";
+                "<img src=\"" + iconUrl(entry.id) + "\" alt=\"\" loading=\"lazy\"><span data-id=\"" + esc(entry.id) + "\">" + esc(entry.name) + "</span></a></li>";
         }).join("") + "</ul>";
     }
 
@@ -308,7 +308,7 @@
                 if (!entry) {
                     return esc(roleId);
                 }
-                return "<a class=\"role role--" + side(entry.team) + "\" href=\"" + pageUrl(entry.id) + "\">" + esc(entry.name) + "</a>";
+                return "<a class=\"role role--" + side(entry.team) + "\" href=\"" + pageUrl(entry.id) + "\" data-id=\"" + esc(entry.id) + "\">" + esc(entry.name) + "</a>";
             });
     }
 
@@ -466,6 +466,39 @@
             }
         });
     }
+
+    // ── 캐릭터 이름 호버창: 이름 위에 마우스를 올리면 능력 문구 (공식 위키 data-role과 같은 방식) ──
+    // 이름에 data-id가 붙어 있으면 PG+ guide/data/roles.json의 정발 능력을 data-ability로 넣고, 모양은 style.css가 맡는다.
+    // 본문은 데이터를 받은 뒤 그려지므로, 화면에 새 이름이 생길 때마다 채운다.
+    var abilitiesPromise = null;
+    function fillAbilities() {
+        var targets = document.querySelectorAll("[data-id]:not([data-ability])");
+        if (!targets.length) {
+            return;
+        }
+        if (!abilitiesPromise) {
+            abilitiesPromise = getJSON("guide/data/roles.json").catch(function () {
+                return {};
+            });
+        }
+        abilitiesPromise.then(function (roles) {
+            Array.prototype.forEach.call(targets, function (element) {
+                var role = roles[element.getAttribute("data-id")];
+                element.setAttribute("data-ability", role && role.ability ? role.ability : "");
+            });
+        });
+    }
+    var fillQueued = false;
+    new MutationObserver(function () {
+        if (fillQueued) {
+            return;
+        }
+        fillQueued = true;
+        window.requestAnimationFrame(function () {
+            fillQueued = false;
+            fillAbilities();
+        });
+    }).observe(document.body, { childList: true, subtree: true });
 
     mountSidebar();
 
