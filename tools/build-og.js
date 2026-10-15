@@ -6,7 +6,7 @@
 // 링크 미리보기 봇(카카오톡·디스코드 등)은 페이지 스크립트를 실행하지 않으므로,
 // 캐릭터마다 오픈그래프 태그를 HTML에 직접 적은 페이지가 따로 있어야 한다.
 // character.html을 그대로 복사하고 <!-- OG --> 자리에 그 캐릭터의 태그만 끼워 넣는다.
-//   제목: "BOTC 위키 - {캐릭터 이름}" / 설명: 능력 / 그림: og/<id>.jpg (tools/build-og-images.js)
+//   제목: "시계탑에 흐른 피(시계피) wiki 페이지 한글 - {캐릭터 이름}" / 설명: 능력 / 그림: og/<id>.jpg (tools/build-og-images.js)
 //
 // character.html을 고치면 반드시 다시 실행한다. 여러 번 실행해도 결과가 같다(C-7).
 // 목록(catalog.json)에 없는 c/*.html은 지운다.
@@ -17,7 +17,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const dataDir = path.resolve(process.argv[2] || path.join(root, "..", "pocket-grimoire", "public", "guide", "data"));
 const SITE = "https://castleq.github.io/botc-wiki-ko/";
-const SITE_NAME = "BOTC Wiki 한글번역 페이지";
+const SITE_NAME = "시계탑에 흐른 피(시계피) wiki 페이지 한글";
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dataDir, "catalog.json"), "utf8"));
 const roles = JSON.parse(fs.readFileSync(path.join(dataDir, "roles.json"), "utf8"));
@@ -44,7 +44,7 @@ const keep = new Set();
 
 catalog.forEach((entry) => {
     const role = roles[entry.id] || {};
-    const title = "BOTC 위키 - " + entry.name;
+    const title = SITE_NAME + " - " + entry.name;
     const url = SITE + "c/" + entry.id + ".html";
     const image = SITE + "og/" + entry.id + ".jpg";
     if (!fs.existsSync(path.join(root, "og", entry.id + ".jpg"))) {
