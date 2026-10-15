@@ -1,0 +1,19 @@
+# botc-wiki-ko (시계피 wiki 한국어 도감) — Claude 작업 메모
+
+- 규약은 PG+(`CastleQ/pocket-grimoire`) `CLAUDE.md`와 같다: 한국어·쉬운 말, **배포(main에 합치기)는 매번 CastleQ 허가 후(C-14)** — 이전 요청의 "배포해"는 다음 작업에 이어지지 않는다.
+- 배포 = main에 합치기 → GitHub Pages가 1~2분 뒤 반영. `curl -s https://castleq.github.io/botc-wiki-ko/<파일> | grep og:title`로 확인.
+- 작업 세션 기록은 `CastleQ/pgplus-notes`의 `sessions/`에 남긴다.
+
+## 이름
+- 사이트 이름: `시계탑에 흐른 피(시계피) wiki 페이지 한글` (탭 제목·상단·og:site_name·주석). 바꿀 때 `git grep`으로 전부 + `tools/build-og.js`의 `SITE_NAME`.
+- 링크 미리보기 제목: `{이름} - 시계피 wiki` (`SHORT_NAME`). 메인만 사이트 이름 그대로(`index.html`에 직접 적음).
+
+## 링크 미리보기(오픈그래프) 페이지
+- 미리보기 봇은 스크립트를 안 돌리고 `?id=`도 구분 못 함 → 페이지마다 고정 파일: `c/<id>.html`, `edition-<id>.html`, `type-<id>.html`, `doc-<키>.html`. **직접 고치지 말고** 틀(`character.html`·`edition.html`·`type.html`·`doc.html`) 또는 `common.js` 목록을 고친 뒤 `node tools/build-og.js <guide/data 폴더>`.
+- PG+ 저장소가 옆에 없으면 데이터만 받아서 실행: `curl -sSfO https://castleq.github.io/pocket-grimoire/guide/data/{catalog,roles}.json` → 그 폴더를 인자로. 다시 돌려 "새로 씀 0"이면 정상.
+- 판·유형·문서 고정 파일은 **저장소 맨 위에 둔다**(하위 폴더 + `<base href>`면 목차 `#앵커` 링크가 메인으로 튐). 캐릭터 `c/`는 `<base href="/botc-wiki-ko/">`를 쓰고 목차가 없어 괜찮다.
+- 페이지 키 읽기는 `W.pageKey(prefix, param)` (고정 주소 → 예전 `?param=` 순). 예전 주소도 계속 열려야 한다.
+- 미리보기 그림 `og/edition-*.jpg`·`og/type-*.jpg`·`og/site.jpg`는 PG+ 판 로고·유형 아이콘·로고를 `convert`로 400×400 양피지색(`#efe6d6`) 바탕에 얹어 한 번 만든 것.
+
+## 로컬 확인
+- 페이지가 `/pocket-grimoire/…` 절대 경로를 읽으므로 `<dir>/botc-wiki-ko`에 저장소를 링크하고 `python3 -m http.server`로 띄운 뒤, Playwright `route`에서 `/pocket-grimoire/**`를 `route.fetch({url: 실제 사이트 주소})` → `fulfill`로 대신 응답(`continue`로 주소만 바꾸면 http→https라 거부됨). Playwright는 전역 설치본: `PW=$(npm root -g)/playwright node t.js` + 스크립트에서 `require(process.env.PW)`.
