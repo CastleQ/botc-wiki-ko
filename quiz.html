@@ -33,9 +33,8 @@
     src: url("quiz/fonts/dumbledor.woff2") format("woff2");
     font-display: swap;
 }
-.page.page--quiz { padding-left: 0; padding-right: 0; }
-.quiz-intro { padding: 0 16px; }
-.quiz-intro h1.title { margin-bottom: 0.2em; }
+/* 퀴즈는 본문 칸 위쪽에 붙여 화면 높이에 맞춘다 */
+.page.page--quiz, .page.page--wide.page--quiz { padding: 0; margin-top: 0; }
 .quiz {
     --q-danger: #B21418;
     --q-success: #6CB26A;
@@ -67,7 +66,7 @@
 /* 화면 전환: 원본 framer-motion (opacity 0→1, tween, anticipate, 0.5초) */
 @keyframes quiz-fade { from { opacity: 0; } to { opacity: 1; } }
 .quiz-screen { animation: quiz-fade 0.5s cubic-bezier(0.7, -0.4, 0.4, 1.4) both; }
-.quiz-home, .quiz-select { min-height: 640px; }
+.quiz-home, .quiz-select { min-height: calc(100vh - 86px); }
 
 /* 원본 버튼: 양쪽 장식 + 테두리 상자, 비활성은 opacity 0.2 */
 .q-button { display: inline-flex; flex-direction: row; text-align: center; align-items: center; text-decoration: none; }
@@ -138,9 +137,9 @@
 }
 .quiz-card__cover { width: 100%; display: flex; align-items: center; justify-content: center; padding: 20px 0; }
 .quiz-card__cover img { width: 100%; }
-.quiz-card__label { background-color: #F1EBDC; color: #7B5D4E; padding: 20px; }
+.quiz-card__label { background-color: #F1EBDC; color: #7B5D4E; padding: 20px; font-size: 130%; }
 .quiz-card__links { display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: space-around; padding: 10px 20px; }
-.quiz-card__links a { display: block; width: 100%; color: #7B5D4E; font-size: 120%; text-decoration: none; padding: 5px 0; }
+.quiz-card__links a { display: block; width: 100%; color: #7B5D4E; font-family: "Noto Sans KR", sans-serif; font-size: 120%; text-decoration: none; padding: 5px 0; }
 .quiz-card__links a:hover { color: var(--q-primary); }
 
 /* 문제·결과 화면: 왼쪽 그리모어(원본 1024×824를 칸에 맞춰 축소) + 오른쪽 문제 칸 */
@@ -290,7 +289,6 @@
     background: var(--q-fancy);
     border: 2px solid #BDA89A;
 }
-.quiz-name__hint { min-height: 1.2em; font-size: 13px; color: #ffb4b4; }
 .quiz-challenge { max-width: 520px; margin: 0 auto 6px; padding: 12px 16px; font-size: 16px; line-height: 1.6; background: rgba(0, 0, 0, 0.45); border: 1px solid #D1BB87; }
 .quiz-challenge strong { color: #D1BB87; }
 .quiz-card__links small { display: block; font-family: "Noto Sans KR", sans-serif; font-size: 12px; color: #9a8577; }
@@ -306,6 +304,12 @@
 .quiz-vs .no { color: var(--q-danger); }
 .quiz-loading { color: #fff; text-align: center; padding: 120px 16px; font-size: 18px; }
 
+/* 낮은 화면: 첫 화면 그림을 줄여 시작 버튼까지 한 화면에 */
+@media (max-height: 820px) {
+    .quiz-home__inner { padding-top: 24px; }
+    .quiz-home__inner > img:first-child { width: 170px; }
+    .quiz-home__title { width: 120px; }
+}
 /* 좁은 화면: 문제 칸을 그리모어 아래로 */
 @media (max-width: 899.98px) {
     .quiz-bar { height: 64px; padding: 0 12px; }
@@ -324,11 +328,6 @@
     <a href="./">시계탑에 흐른 피(시계피) wiki 페이지 한글</a>
 </nav>
 <main class="page page--quiz" id="page">
-    <div class="quiz-intro">
-        <nav class="crumbs"><a href="./">← 메인으로</a></nav>
-        <h1 class="title">이야기꾼 퀴즈</h1>
-        <p class="lead">이야기꾼이 게임 기본기와, 게임을 진행하며 만나게 될 여러 상황에 익숙해지도록 돕는 퀴즈입니다. 첫 게임을 진행하기 전에 실력을 시험해 보거나, 더 어려운 내용을 다룰 준비가 되었을 때 실력을 다듬어 보세요.</p>
-    </div>
     <div class="quiz" id="quiz"><div class="quiz-loading">불러오는 중…</div></div>
     <p class="credit" style="padding: 0 16px;">공식 퀴즈 <a href="https://quiz.bloodontheclocktower.com/" target="_blank" rel="noopener">quiz.bloodontheclocktower.com</a>을 한국어로 옮긴 비공식 번역입니다. 예시 플레이어 이름은 한국어 이름으로 바꾸었습니다.</p>
 </main>
@@ -506,18 +505,20 @@
         return html + "</div></div>";
     }
 
-    // 그리모어(1024×824)를 칸 폭에 맞춰 축소. 넓은 화면에서는 문제 칸 높이도 같이 맞춘다.
+    // 그리모어(1024×824)를 칸에 맞춰 축소. 넓은 화면에서는 브라우저 높이(보라 막대 제외)에도 맞춰 스크롤 없이 한 화면에 들어오게 하고, 문제 칸 높이도 같이 맞춘다.
     function fitGrimoire() {
         var box = root.querySelector(".grimoire-box");
         if (!box) return;
         var stage = box.querySelector(".grimoire");
+        var stacked = window.matchMedia("(max-width: 899.98px)").matches;
+        var barHeight = root.querySelector(".quiz-bar").offsetHeight;
         var scale = box.clientWidth / 1024;
+        if (!stacked) scale = Math.min(scale, (window.innerHeight - barHeight) / 824);
         var height = Math.round(824 * scale);
         box.style.height = height + "px";
-        stage.style.transform = "scale(" + scale + ")";
+        stage.style.transform = "translateX(" + Math.max(0, (box.clientWidth - 1024 * scale) / 2) + "px) scale(" + scale + ")";
         var wrap = root.querySelector(".quiz-panel-wrap");
         if (wrap) {
-            var stacked = window.matchMedia("(max-width: 899.98px)").matches;
             wrap.style.height = stacked ? "" : height + "px";
         }
     }
@@ -559,27 +560,29 @@
     function homeScreen(vs) {
         var intro = vs ? "<div class=\"quiz-challenge\"><strong>" + esc(vs.name) + "</strong>님이 <strong>" + esc(quizName(vs.quiz)) + "</strong>에서 " +
             vs.score + "/" + vs.quiz.questions.length + "점을 받았어요.<br>같은 문제를 풀고 점수를 비교해 보세요!</div>" :
-            "<h2>퀴즈를 풀며 시계탑에 흐른 피 지식을 시험해 보세요</h2>";
+            "<h2>게임 속 여러 모호한 상호작용에서 정답을 찾아보세요.<br>이야기꾼으로서 첫 게임을 진행하기 전에 실력을 시험해 보거나,<br>플레이어로서 게임을 이해하는 데 도움이 될 거예요.</h2>";
         return bar(vs ? quizName(vs.quiz) : "") + "<div class=\"quiz-screen quiz-home\"><div class=\"quiz-home__inner\">" +
             "<img src=\"" + IMG + "botc_head.webp\" width=\"275\" height=\"295\" alt=\"\">" +
             "<img class=\"quiz-home__title\" src=\"" + IMG + "quiz_title_text.webp\" width=\"167\" height=\"127\" alt=\"The Quiz\">" +
             intro +
-            "<div class=\"quiz-name\"><label for=\"quiz-name\">이름</label><input id=\"quiz-name\" maxlength=\"12\" autocomplete=\"nickname\" placeholder=\"결과 공유에 쓸 이름\" value=\"" + esc(playerName()) + "\">" +
-            "<div class=\"quiz-name__hint\" aria-live=\"polite\"></div></div>" +
-            button(vs ? "#/" + vs.quiz.id + "/question-1" : "#/select", vs ? "도전하기" : "시작하기", true, false) + "</div></div>";
+            "<div class=\"quiz-name\"><label for=\"quiz-name\">이름</label><input id=\"quiz-name\" maxlength=\"12\" autocomplete=\"nickname\" value=\"" + esc(playerName()) + "\"></div>" +
+            button(vs ? "#/" + vs.quiz.id + "/question-1" : "#/select", vs ? "도전하기" : "시작하기", !!playerName(), false) + "</div></div>";
     }
 
-    // 시작 버튼: 이름이 있어야 넘어간다
+    // 시작 버튼: 이름이 비어 있으면 비활성 (흐리게 + 누를 수 없음)
     function bindHome() {
         var input = root.querySelector("#quiz-name");
         if (!input) return;
         var start = root.querySelector(".quiz-home .q-button");
+        input.addEventListener("input", function () {
+            var empty = !input.value.trim();
+            start.setAttribute("aria-disabled", empty ? "true" : "false");
+            start.tabIndex = empty ? -1 : 0;
+        });
         start.addEventListener("click", function (event) {
             var name = input.value.trim();
             if (!name) {
                 event.preventDefault();
-                root.querySelector(".quiz-name__hint").textContent = "이름을 입력해 주세요.";
-                input.focus();
                 return;
             }
             storeSet(NAME_KEY, name);
