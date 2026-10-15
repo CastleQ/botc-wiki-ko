@@ -28,11 +28,11 @@
     var key = new URLSearchParams(window.location.search).get("p") || "";
     // 완성되어 옮겨 간 문서의 옛 주소
     if (key === "experimental") {
-        window.location.replace("type.html?id=experimental");
+        window.location.replace("type-experimental.html");
         return;
     }
     if (Object.prototype.hasOwnProperty.call(W.DOCS, key)) {
-        window.location.replace("doc.html?p=" + key);
+        window.location.replace("doc-" + key + ".html");
         return;
     }
     var title = Object.prototype.hasOwnProperty.call(W.WIP_PAGES, key) ? W.WIP_PAGES[key] : "준비 중인 문서";

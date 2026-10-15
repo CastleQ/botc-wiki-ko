@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<!-- OG: 메인 링크 미리보기 (다른 페이지는 tools/build-og.js가 만든다) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="시계탑에 흐른 피(시계피) wiki 페이지 한글">
+<meta property="og:title" content="시계탑에 흐른 피(시계피) wiki 페이지 한글">
+<meta property="og:description" content="시계탑에 흐른 피(Blood on the Clocktower) 공식 위키의 캐릭터·규칙 문서 한국어 번역">
+<meta property="og:url" content="https://castleq.github.io/botc-wiki-ko/">
+<meta property="og:image" content="https://castleq.github.io/botc-wiki-ko/og/site.jpg">
+<meta property="og:image:width" content="400">
+<meta property="og:image:height" content="400">
+<meta property="og:image:alt" content="시계탑에 흐른 피(시계피) wiki 페이지 한글">
+<meta name="twitter:card" content="summary">
 <title>시계탑에 흐른 피(시계피) wiki 페이지 한글</title>
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png">
@@ -82,11 +93,11 @@
     }
 
     document.getElementById("editions").innerHTML = W.EDITIONS.map(function (edition) {
-        return tile("edition.html?id=" + edition.id, edition.logo, edition.alt, edition.name);
+        return tile("edition-" + edition.id + ".html", edition.logo, edition.alt, edition.name);
     }).join("");
     // 위키와 같이 첫 줄 주민·외지인·하수인·악마, 둘째 줄 여행자·전설·설화
     function typeTile(type) {
-        return tile("type.html?id=" + type.id, W.BASE + "guide/img/generic_" + type.id + ".webp", "", type.name);
+        return tile("type-" + type.id + ".html", W.BASE + "guide/img/generic_" + type.id + ".webp", "", type.name);
     }
     document.getElementById("types").innerHTML = W.TYPES.slice(0, 4).map(typeTile).join("");
     document.getElementById("types-special").innerHTML = W.TYPES.slice(4).map(typeTile).join("");
