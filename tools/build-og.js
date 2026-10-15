@@ -17,7 +17,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const dataDir = path.resolve(process.argv[2] || path.join(root, "..", "pocket-grimoire", "public", "guide", "data"));
 const SITE = "https://castleq.github.io/botc-wiki-ko/";
-const SITE_NAME = "BOTC Wiki 한글번역 페이지";
+const SITE_NAME = "시계탑에 흐른 피(시계피) wiki 페이지 한글";
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dataDir, "catalog.json"), "utf8"));
 const roles = JSON.parse(fs.readFileSync(path.join(dataDir, "roles.json"), "utf8"));
