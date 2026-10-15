@@ -19,6 +19,9 @@
 | `edition-*.html` · `type-*.html` · `doc-*.html` | 판·유형·문서별 페이지 — 틀 복사본 + 링크 미리보기. **`tools/build-og.js`가 만든다. 직접 고치지 않는다** |
 | `og/<id>.jpg` | 링크 미리보기 그림 400×400 — `tools/build-og-images.js`가 만든다. `og/edition-*.jpg` · `og/type-*.jpg`(PG+ 판 로고·유형 아이콘), `og/site.jpg`(사이트 로고)는 한 번 만들어 둔 것 |
 | `common.js` / `style.css` | 모든 페이지 공용 설정·모양 |
+| `quiz.html` | 이야기꾼 퀴즈 — 공식 퀴즈(quiz.bloodontheclocktower.com) 206문제 한국어판. 화면 값·그림은 원본 그대로, 토큰은 원본 빈 토큰 + PG+ 아이콘 + 한국어 이름. 주소 `quiz.html#/<퀴즈>/question-<번호>` |
+| `quiz/data.json` | 퀴즈 데이터(번역문·좌석·정답). **pgplus-notes `tools/quiz-ko/build.js`가 만든다. 직접 고치지 않는다** |
+| `quiz/img/` · `quiz/fonts/` | 원본 퀴즈 사이트에서 복사한 배경·장식 그림과 Dumbledor 글꼴 |
 
 코드는 포켓 그리모어 플러스+의 캐릭터 가이드 화면을 바탕으로 하며 GPL-3.0을 따릅니다.
 
@@ -28,7 +31,7 @@
 
 - 캐릭터 `c/<id>.html`: 설명(능력) + 캐릭터 아이콘
 - 판 `edition-<id>.html` · 유형 `type-<id>.html` · 문서 `doc-<키>.html`: 짧은 설명 + 판 로고·유형 아이콘·사이트 로고
-- 메인 `index.html`: 태그를 파일에 직접 적어 둠
+- 메인 `index.html` · 이야기꾼 퀴즈 `quiz.html`: 태그를 파일에 직접 적어 둠
 
 - `character.html` · `edition.html` · `type.html` · `doc.html`이나 common.js 목록(DOCS 등)을 고친 뒤: `node tools/build-og.js` (PG+ 저장소가 옆 폴더 `../pocket-grimoire`에 있어야 한다)
 - 새 캐릭터가 늘었을 때: `node tools/build-og-images.js` 다음 `node tools/build-og.js`

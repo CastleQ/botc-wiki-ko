@@ -404,7 +404,7 @@
 
     function mountSidebar() {
         var menu = [
-            { title: "게임 정보", items: docItems("게임 정보") },
+            { title: "게임 정보", items: docItems("게임 정보").concat([["이야기꾼 퀴즈", "quiz.html"]]) },
             { title: "규칙서", items: docItems("규칙서") },
             { title: "캐릭터", items: EDITIONS.map(function (edition) {
                 return [edition.name, "edition-" + edition.id + ".html"];
