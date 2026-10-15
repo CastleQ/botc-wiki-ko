@@ -139,7 +139,7 @@
 .quiz-card__cover img { width: 100%; }
 .quiz-card__label { background-color: #F1EBDC; color: #7B5D4E; padding: 20px; font-size: 130%; }
 .quiz-card__links { display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: space-around; padding: 10px 20px; }
-.quiz-card__links a { display: block; width: 100%; color: #7B5D4E; font-family: "Noto Sans KR", sans-serif; font-size: 120%; text-decoration: none; padding: 5px 0; }
+.quiz-card__links a { display: block; width: 100%; color: #7B5D4E; font-family: "Noto Sans KR", sans-serif; font-size: 102%; text-decoration: none; padding: 5px 0; }
 .quiz-card__links a:hover { color: var(--q-primary); }
 
 /* 문제·결과 화면: 왼쪽 그리모어(원본 1024×824를 칸에 맞춰 축소) + 오른쪽 문제 칸 */
@@ -294,14 +294,6 @@
 .quiz-card__links small { display: block; font-family: "Noto Sans KR", sans-serif; font-size: 12px; color: #9a8577; }
 .quiz-share { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .quiz-share__done { min-height: 1.2em; font-size: 13px; color: var(--q-success); }
-.quiz-vs { width: 100%; text-align: left; color: #5C1F22; }
-.quiz-vs h3 { text-align: center; font-style: normal; font-family: var(--q-head); font-size: 1.3em; margin: 0 0 8px; }
-.quiz-vs table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.quiz-vs th, .quiz-vs td { border-bottom: 1px solid #e3d7c7; padding: 5px 4px; vertical-align: top; }
-.quiz-vs th { font-weight: bold; text-align: center; }
-.quiz-vs td.mark { text-align: center; width: 3.2em; font-weight: bold; }
-.quiz-vs .ok { color: var(--q-success); }
-.quiz-vs .no { color: var(--q-danger); }
 .quiz-loading { color: #fff; text-align: center; padding: 120px 16px; font-size: 18px; }
 
 /* 낮은 화면: 첫 화면 그림을 줄여 시작 버튼까지 한 화면에 */
@@ -370,15 +362,6 @@
     var NAME_KEY = "botcquiz_name";
     function playerName() {
         return (storeGet(NAME_KEY) || "").trim();
-    }
-    // 도전자(공유 링크로 받은 친구 결과): botcquiz_vs_<퀴즈> = { name, answers("0213-…") }
-    function challenger(quizID) {
-        try {
-            var data = JSON.parse(storeGet("botcquiz_vs_" + quizID) || "null");
-            return data && typeof data.name === "string" && typeof data.answers === "string" ? data : null;
-        } catch (e) {
-            return null;
-        }
     }
     function bestScore(quizID) {
         var n = parseInt(storeGet("botcquiz_best_" + quizID), 10);
@@ -556,17 +539,25 @@
     }
 
     // ── 화면 ──
-    // 첫 화면. vs가 있으면 공유 링크로 들어온 도전 화면 (시작하면 바로 그 퀴즈로)
-    function homeScreen(vs) {
-        var intro = vs ? "<div class=\"quiz-challenge\"><strong>" + esc(vs.name) + "</strong>님이 <strong>" + esc(quizName(vs.quiz)) + "</strong>에서 " +
-            vs.score + "/" + vs.quiz.questions.length + "점을 받았어요.<br>같은 문제를 풀고 점수를 비교해 보세요!</div>" :
-            "<h2>게임 속 여러 모호한 상호작용에서 정답을 찾아보세요.<br>이야기꾼으로서 첫 게임을 진행하기 전에 실력을 시험해 보거나,<br>플레이어로서 게임을 이해하는 데 도움이 될 거예요.</h2>";
-        return bar(vs ? quizName(vs.quiz) : "") + "<div class=\"quiz-screen quiz-home\"><div class=\"quiz-home__inner\">" +
+    // 공유 링크로 들어온 사람에게 보이는 화면: "○○님은 … n점입니다." + [나도 해보기]
+    function landingScreen(quiz, score, name) {
+        return bar(quizName(quiz)) + "<div class=\"quiz-screen quiz-home\"><div class=\"quiz-home__inner\">" +
+            "<img src=\"" + IMG + "botc_head.webp\" width=\"275\" height=\"295\" alt=\"\">" +
+            "<img class=\"quiz-home__title\" src=\"" + IMG + "quiz_title_text.webp\" width=\"167\" height=\"127\" alt=\"The Quiz\">" +
+            "<div class=\"quiz-challenge\"><strong>" + esc(name) + "</strong>님은 <strong>" + esc(quizName(quiz)) + "</strong>에서 " +
+            score + "/" + quiz.questions.length + "점입니다.</div>" +
+            button("quiz.html", "나도 해보기", true, false) + "</div></div>";
+    }
+
+    // 첫 화면
+    function homeScreen() {
+        var intro = "<h2>게임 속 여러 모호한 상호작용에서 정답을 찾아보세요.<br>이야기꾼으로서 첫 게임을 진행하기 전에 실력을 시험해 보거나,<br>플레이어로서 게임을 이해하는 데 도움이 될 거예요.</h2>";
+        return bar("") + "<div class=\"quiz-screen quiz-home\"><div class=\"quiz-home__inner\">" +
             "<img src=\"" + IMG + "botc_head.webp\" width=\"275\" height=\"295\" alt=\"\">" +
             "<img class=\"quiz-home__title\" src=\"" + IMG + "quiz_title_text.webp\" width=\"167\" height=\"127\" alt=\"The Quiz\">" +
             intro +
             "<div class=\"quiz-name\"><label for=\"quiz-name\">이름</label><input id=\"quiz-name\" maxlength=\"12\" autocomplete=\"nickname\" value=\"" + esc(playerName()) + "\"></div>" +
-            button(vs ? "#/" + vs.quiz.id + "/question-1" : "#/select", vs ? "도전하기" : "시작하기", !!playerName(), false) + "</div></div>";
+            button("#/select", "시작하기", !!playerName(), false) + "</div></div>";
     }
 
     // 시작 버튼: 이름이 비어 있으면 비활성 (흐리게 + 누를 수 없음)
@@ -666,47 +657,16 @@
         });
         var result = quiz.results[score] || { text: "", token: "" };
         if (score > bestScore(quiz.id)) storeSet("botcquiz_best_" + quiz.id, String(score));
-        var mine = answerString(quiz);
         var name = playerName();
         var content = "<div class=\"quiz-result\"><h2>" + (name ? esc(name) + "님의 " : "") + "점수<br>" + score + "/" + answeredCount + "</h2><div><h3>" + esc(result.text) + "</h3></div>" +
             "<div class=\"quiz-result__token\"><div class=\"shadow\"></div>" + tokenHtml(result.token, "character", roleName(result.token), "") + "</div>" +
-            "<div class=\"quiz-share\">" + button(window.location.hash, "결과 공유하기", true, true) + "<div class=\"quiz-share__done\" aria-live=\"polite\"></div></div>" +
-            compareHtml(quiz, mine, name) + "</div>";
+            "<div class=\"quiz-share\">" + button(window.location.hash, "결과 공유하기", true, true) + "<div class=\"quiz-share__done\" aria-live=\"polite\"></div></div></div>";
         shareData = {
-            text: "[이야기꾼 퀴즈] " + (name || "익명") + "님은 " + quizName(quiz) + "에서 " + score + "/" + quiz.questions.length + "점! " + result.text + "\n같은 문제로 겨뤄 보기:",
-            url: "https://castleq.github.io/botc-wiki-ko/quiz.html#/" + quiz.id + "/vs/" + mine + "/" + encodeURIComponent(name || "익명")
+            text: "[이야기꾼 퀴즈] " + (name || "익명") + "님은 " + quizName(quiz) + "에서 " + score + "/" + quiz.questions.length + "점입니다.",
+            url: "https://castleq.github.io/botc-wiki-ko/quiz.html#/" + quiz.id + "/score/" + score + "/" + encodeURIComponent(name || "익명")
         };
         var bg = "<div class=\"grimoire-box result-box\"><div class=\"grimoire\" style=\"background:url('" + IMG + "result-" + quiz.groupKey + ".webp') center / cover\"></div></div>";
         return playScreen(quiz, [], content, "다른 퀴즈 풀기", bg);
-    }
-
-    // 답 문자열: 문제마다 고른 보기 번호(0~3), 안 푼 문제는 "-"
-    function answerString(quiz) {
-        return quiz.questions.map(function (q, i) {
-            var a = getAnswer(quiz.id, i);
-            return a > -1 ? String(a) : "-";
-        }).join("");
-    }
-    function scoreOf(quiz, answers) {
-        return quiz.questions.reduce(function (n, q, i) {
-            return n + (answers.charAt(i) === String(q.a) ? 1 : 0);
-        }, 0);
-    }
-
-    // 친구 결과와 문제별 비교 (공유 링크로 들어와 끝까지 푼 경우)
-    function compareHtml(quiz, mine, name) {
-        var vs = challenger(quiz.id);
-        if (!vs) return "";
-        var mark = function (answers, i) {
-            return answers.charAt(i) === String(quiz.questions[i].a) ? "<span class=\"ok\">○</span>" : "<span class=\"no\">✕</span>";
-        };
-        var html = "<div class=\"quiz-vs\"><h3>" + esc(name || "나") + " " + scoreOf(quiz, mine) + " : " + scoreOf(quiz, vs.answers) + " " + esc(vs.name) + "</h3>" +
-            "<table><thead><tr><th>문제</th><th>" + esc(name || "나") + "</th><th>" + esc(vs.name) + "</th></tr></thead><tbody>";
-        quiz.questions.forEach(function (q, i) {
-            var text = q.q.length > 34 ? q.q.slice(0, 34) + "…" : q.q;
-            html += "<tr><td>" + (i + 1) + ". " + esc(text) + "</td><td class=\"mark\">" + mark(mine, i) + "</td><td class=\"mark\">" + mark(vs.answers, i) + "</td></tr>";
-        });
-        return html + "</tbody></table></div>";
     }
 
     // 결과 공유: 휴대폰은 공유 창, 아니면 복사
@@ -741,20 +701,18 @@
         shareData = null;
         if (!hash) {
             html = homeScreen();
-        } else if (quiz && parts[1] === "vs") {
-            // 공유 링크: #/<퀴즈>/vs/<답 문자열>/<이름>
-            var answers = (parts[2] || "").replace(/[^0-9-]/g, "").slice(0, quiz.questions.length);
-            var vsName = "";
+        } else if (quiz && parts[1] === "score") {
+            // 공유 링크: #/<퀴즈>/score/<점수>/<이름>
+            var shared = Math.min(Math.max(parseInt(parts[2], 10) || 0, 0), quiz.questions.length);
+            var sharedName = "";
             try {
-                vsName = decodeURIComponent(parts.slice(3).join("/")).trim().slice(0, 12);
+                sharedName = decodeURIComponent(parts.slice(3).join("/")).trim().slice(0, 12);
             } catch (e) { /* 잘못된 주소 */ }
-            if (answers.length !== quiz.questions.length) {
-                window.location.replace("#/select");
-                return;
-            }
-            vsName = vsName || "익명";
-            storeSet("botcquiz_vs_" + quiz.id, JSON.stringify({ name: vsName, answers: answers }));
-            html = homeScreen({ quiz: quiz, name: vsName, score: scoreOf(quiz, answers) });
+            html = landingScreen(quiz, shared, sharedName || "익명");
+        } else if (quiz && parts[1] === "vs") {
+            // 예전(두 사람 비교) 공유 링크는 첫 화면으로
+            window.location.replace("#/");
+            return;
         } else if (hash === "select") {
             html = selectScreen();
         } else if (quiz && /^question-\d+$/.test(parts[1] || "")) {
