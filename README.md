@@ -22,7 +22,7 @@
 
 ## 링크 미리보기(오픈그래프)
 
-캐릭터 주소 `c/<id>.html`을 공유하면 제목 "BOTC 위키 - 캐릭터 이름", 설명(능력), 캐릭터 아이콘이 미리보기로 뜬다.
+캐릭터 주소 `c/<id>.html`을 공유하면 제목 "시계탑에 흐른 피(시계피) wiki 페이지 한글 - 캐릭터 이름", 설명(능력), 캐릭터 아이콘이 미리보기로 뜬다.
 
 - `character.html`을 고친 뒤: `node tools/build-og.js` (PG+ 저장소가 옆 폴더 `../pocket-grimoire`에 있어야 한다)
 - 새 캐릭터가 늘었을 때: `node tools/build-og-images.js` 다음 `node tools/build-og.js`
