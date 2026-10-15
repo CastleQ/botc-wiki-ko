@@ -221,13 +221,13 @@
         if (isEditionMember(entry)) {
             return {
                 title: EDITION_NAMES[entry.edition],
-                href: "edition.html?id=" + entry.edition,
+                href: "edition-" + entry.edition + ".html",
                 order: flatten(editionSections(catalog, entry.edition))
             };
         }
         return {
             title: TEAM_NAMES[entry.team] || "",
-            href: "type.html?id=" + entry.team,
+            href: "type-" + entry.team + ".html",
             order: flatten(typeSections(catalog, entry.team)).filter(function (other) {
                 return !isEditionMember(other);
             })
@@ -240,6 +240,12 @@
 
     // 캐릭터 페이지 주소: 캐릭터마다 오픈그래프(링크 미리보기)가 들어간 고정 페이지 c/<id>.html
     // (tools/build-og.js가 character.html을 복사해 만든다)
+    // 판·유형·문서 페이지 키: 오픈그래프가 들어간 고정 페이지 <prefix>-<키>.html 주소, 또는 예전 주소 <prefix>.html?<param>=<키>
+    function pageKey(prefix, param) {
+        var match = window.location.pathname.match(new RegExp("/" + prefix + "-([a-z0-9_-]+)\\.html$"));
+        return (match && match[1]) || new URLSearchParams(window.location.search).get(param) || "";
+    }
+
     function pageUrl(id) {
         return "c/" + encodeURIComponent(id) + ".html";
     }
@@ -262,23 +268,23 @@
 
     // 위키 문서 링크 [글자](wiki:문서) → 이 사이트에 있는 문서는 이 사이트로, 없는 문서는 원문 위키로
     var WIKI_LINKS = {
-        "Fabled": "type.html?id=fabled",
-        "Travellers": "type.html?id=traveller",
-        "Loric": "type.html?id=loric",
-        "Experimental": "type.html?id=experimental",
-        "Trouble_Brewing": "edition.html?id=tb",
-        "Bad_Moon_Rising": "edition.html?id=bmr",
-        "Sects_&_Violets": "edition.html?id=snv",
-        "Glossary": "doc.html?p=glossary",
-        "Storyteller_Advice": "doc.html?p=storyteller-advice",
-        "Player_Strategy": "doc.html?p=player-strategy",
-        "Changelog": "doc.html?p=changelog",
-        "Setup": "doc.html?p=setup",
-        "Rules_Explanation": "doc.html?p=rules",
-        "Abilities": "doc.html?p=abilities",
-        "States": "doc.html?p=states",
-        "Teensyville": "doc.html?p=teensyville",
-        "Script_Tool": "doc.html?p=script-tool"
+        "Fabled": "type-fabled.html",
+        "Travellers": "type-traveller.html",
+        "Loric": "type-loric.html",
+        "Experimental": "type-experimental.html",
+        "Trouble_Brewing": "edition-tb.html",
+        "Bad_Moon_Rising": "edition-bmr.html",
+        "Sects_&_Violets": "edition-snv.html",
+        "Glossary": "doc-glossary.html",
+        "Storyteller_Advice": "doc-storyteller-advice.html",
+        "Player_Strategy": "doc-player-strategy.html",
+        "Changelog": "doc-changelog.html",
+        "Setup": "doc-setup.html",
+        "Rules_Explanation": "doc-rules.html",
+        "Abilities": "doc-abilities.html",
+        "States": "doc-states.html",
+        "Teensyville": "doc-teensyville.html",
+        "Script_Tool": "doc-script-tool.html"
     };
     function linkHtml(label, target) {
         if (/^https?:\/\//.test(target)) {
@@ -335,7 +341,7 @@
         "random": "임의 문서"
     };
 
-    // 위키 일반 문서 (doc.html?p=<키>). 번역은 PG+ guide/data/pages/<키>.json. tocLevels는 목차에 넣을 제목 단계 수
+    // 위키 일반 문서 (doc-<키>.html, 예전 주소 doc.html?p=<키>). 번역은 PG+ guide/data/pages/<키>.json. tocLevels는 목차에 넣을 제목 단계 수
     var DOCS = {
         "glossary": { title: "용어집" },
         "storyteller-advice": { title: "이야기꾼 조언" },
@@ -371,6 +377,7 @@
         getJSON: getJSON,
         iconUrl: iconUrl,
         pageUrl: pageUrl,
+        pageKey: pageKey,
         side: side,
         grid: grid,
         sectionsHtml: sectionsHtml,
@@ -391,7 +398,7 @@
     // 아직 만들지 않은 문서는 wip.html?p=<키> ("아직 작업 중 이에요 :)")로 보낸다.
     function docItems(group) {
         return DOC_GROUPS[group].map(function (key) {
-            return [DOCS[key].title, "doc.html?p=" + key];
+            return [DOCS[key].title, "doc-" + key + ".html"];
         });
     }
 
@@ -400,10 +407,10 @@
             { title: "게임 정보", items: docItems("게임 정보") },
             { title: "규칙서", items: docItems("규칙서") },
             { title: "캐릭터", items: EDITIONS.map(function (edition) {
-                return [edition.name, "edition.html?id=" + edition.id];
+                return [edition.name, "edition-" + edition.id + ".html"];
             }).concat(["traveller", "fabled", "loric"].map(function (team) {
-                return [TEAM_NAMES[team], "type.html?id=" + team];
-            })).concat([["실험 캐릭터", "type.html?id=experimental"]]) },
+                return [TEAM_NAMES[team], "type-" + team + ".html"];
+            })).concat([["실험 캐릭터", "type-experimental.html"]]) },
             { title: "둘러보기", items: ["recent-changes", "random", ["오역 제보 및 기타문의", "https://open.kakao.com/o/smyEIE4"]] }
         ];
         var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;
@@ -472,6 +479,9 @@
     // ── 캐릭터 이름 호버창: 이름 위에 마우스를 올리면 능력 문구 (공식 위키 data-role과 같은 방식) ──
     // 이름에 data-id가 붙어 있으면 PG+ guide/data/roles.json의 정발 능력을 data-ability로 넣고, 모양은 style.css가 맡는다.
     // 본문은 데이터를 받은 뒤 그려지므로, 화면에 새 이름이 생길 때마다 채운다.
+    if (typeof document === "undefined") {
+        return;
+    }
     var abilitiesPromise = null;
     function fillAbilities() {
         var targets = document.querySelectorAll("[data-id]:not([data-ability])");

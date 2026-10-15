@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<!-- OG -->
 <title>시계탑에 흐른 피(시계피) wiki 페이지 한글</title>
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="img/favicon-192.png">
@@ -75,7 +76,7 @@
     var W = window.WikiKo;
     var esc = W.esc;
     var page = document.getElementById("page");
-    var key = new URLSearchParams(window.location.search).get("p") || "";
+    var key = W.pageKey("doc", "p");
     var doc = Object.prototype.hasOwnProperty.call(W.DOCS, key) ? W.DOCS[key] : null;
 
     function blockHtml(block, byId) {
