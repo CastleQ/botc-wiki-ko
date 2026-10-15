@@ -19,7 +19,7 @@
 | `edition-*.html` · `type-*.html` · `doc-*.html` | 판·유형·문서별 페이지 — 틀 복사본 + 링크 미리보기. **`tools/build-og.js`가 만든다. 직접 고치지 않는다** |
 | `og/<id>.jpg` | 링크 미리보기 그림 400×400 — `tools/build-og-images.js`가 만든다. `og/edition-*.jpg` · `og/type-*.jpg`(PG+ 판 로고·유형 아이콘), `og/site.jpg`(사이트 로고)는 한 번 만들어 둔 것 |
 | `common.js` / `style.css` | 모든 페이지 공용 설정·모양 |
-| `quiz.html` | 이야기꾼 퀴즈 — 공식 퀴즈(quiz.bloodontheclocktower.com) 206문제 한국어판. 화면 값·그림은 원본 그대로, 토큰은 원본 빈 토큰 + PG+ 아이콘 + 한국어 이름. 주소 `quiz.html#/<퀴즈>/question-<번호>` |
+| `quiz.html` | 이야기꾼 퀴즈 — 공식 퀴즈(quiz.bloodontheclocktower.com) 206문제 한국어판. 화면 값·그림은 원본 그대로, 토큰은 원본 빈 토큰 + PG+ 아이콘 + 한국어 이름. 주소 `quiz.html#/<퀴즈>/question-<번호>`. 도감 추가 기능: 시작 전 이름 입력, 결과 공유(링크 `#/<퀴즈>/vs/<답>/<이름>`로 친구와 문제별 비교), 퀴즈별 최고 점수 |
 | `quiz/data.json` | 퀴즈 데이터(번역문·좌석·정답). **pgplus-notes `tools/quiz-ko/build.js`가 만든다. 직접 고치지 않는다** |
 | `quiz/img/` · `quiz/fonts/` | 원본 퀴즈 사이트에서 복사한 배경·장식 그림과 Dumbledor 글꼴 |
 
