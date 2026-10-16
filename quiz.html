@@ -299,24 +299,23 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    width: 100%;
-    margin: 4px 0 8px;
-    padding: 10px 14px;
+    width: calc(100% - 8px);
+    margin: 4px 4px 8px;
+    padding: 10px 15px;
     font: inherit;
+    line-height: 1.5;
     text-align: left;
     color: #5C1F22;
     background: #F1EBDC;
-    border: 1px solid #BDA89A;
-    border-radius: 10px;
+    border: solid 2px #BDA89A;
     cursor: pointer;
     transition: background-color 0.2s, box-shadow 0.2s;
 }
 .ask:hover, .ask:focus-visible { background: #e9dcc4; box-shadow: 0 2px 6px rgba(92, 31, 34, 0.18); }
-.ask__emoji { font-size: 24px; line-height: 1; }
-.ask__text { flex: 1; line-height: 1.35; }
-.ask__text strong { display: block; font-size: 15px; }
-.ask__text small { display: block; font-size: 12.5px; color: #7B5D4E; text-decoration: underline; text-underline-offset: 2px; }
-.ask__arrow { font-size: 18px; color: #7B5D4E; transition: transform 0.2s; }
+.ask { gap: 6px; }
+.ask__emoji { font-size: 1em; line-height: 1; }
+.ask__text { flex: 1; font-weight: bold; }
+.ask__arrow { color: #7B5D4E; transition: transform 0.2s; }
 .ask:hover .ask__arrow { transform: translateX(3px); }
 .ask-box { margin: 0 0 8px; padding: 10px 12px; background: #fff; border: 1px dashed #BDA89A; border-radius: 10px; font-size: 13px; }
 .ask-box input { width: 100%; padding: 6px 8px; margin: 6px 0; font: inherit; font-size: 12.5px; color: #5C1F22; border: 1px solid #BDA89A; background: #FAF6E6; }
@@ -670,7 +669,7 @@
             html += "<p class=\"answer-reason\">" + esc(q.r) + "</p>";
             if (!right) {
                 html += "<button type=\"button\" class=\"ask\" aria-expanded=\"false\"><span class=\"ask__emoji\" aria-hidden=\"true\">🤔</span>" +
-                    "<span class=\"ask__text\"><strong>왜 틀렸는지 모르겠어요</strong><small>이 문제 링크로 친구들과 이야기해 보기</small></span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
+                    "<span class=\"ask__text\">왜 틀렸는지 모르겠어요</span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
                     "<div class=\"ask-box\" hidden>이 문제만 바로 열리는 링크예요. 단톡방에 올리고 같이 토론해 보세요!" +
                     "<input type=\"text\" readonly value=\"" + esc(questionUrl(quiz, num)) + "\" aria-label=\"이 문제 링크\">" +
                     "<button type=\"button\">링크 공유하기</button><span class=\"ask-box__done\" aria-live=\"polite\"></span></div>";
