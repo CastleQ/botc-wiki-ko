@@ -8,7 +8,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="시계탑에 흐른 피(시계피) wiki 페이지 한글">
 <meta property="og:title" content="이야기꾼 퀴즈 - 시계피 wiki">
-<meta property="og:description" content="게임 기본기부터 에디션별 상황까지, 이야기꾼 실력을 시험하는 퀴즈 206문제 (공식 퀴즈 한국어판)">
+<meta property="og:description" content="게임 기본기부터 에디션별 상황까지, 이야기꾼 실력을 시험하는 퀴즈 231문제 (공식 퀴즈 한국어판 + 마스터 이야기꾼 초고난도)">
 <meta property="og:url" content="https://castleq.github.io/botc-wiki-ko/quiz.html">
 <meta property="og:image" content="https://castleq.github.io/botc-wiki-ko/og/quiz.jpg">
 <meta property="og:image:width" content="400">
@@ -322,6 +322,63 @@
 .ask-box button { padding: 6px 14px; font: inherit; font-size: 13px; color: #fff; background: #7B5D4E; border: 0; border-radius: 6px; cursor: pointer; }
 .ask-box button:hover { background: var(--q-primary); }
 .ask-box__done { margin-left: 8px; color: var(--q-success); }
+/* 복수 선택 문항 · 문항 정보 줄 · 근거 링크 */
+.question__meta { margin: 0 0 6px; font-size: 13px; color: #7B5D4E; line-height: 1.5; }
+.question__hint { margin: 6px 0 0; font-size: 13px; font-weight: bold; color: #7B5D4E; }
+.answers--multi .answer label::before { content: "☐ "; }
+.answers--multi .answer:has(input:checked) label::before { content: "☑ "; }
+.answers:not(.is-answered) .answer:has(input:checked) { background-color: #BDA89A; color: #fff; }
+.answer-refs { margin: 0 0 8px; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+.answer-refs a { color: #5C1F22; }
+/* 해설 화면: 처리 후 마도서에서 바뀐 좌석 강조 + 바뀐 내용 목록 */
+.grimoire-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.grimoire-col .grimoire-box { flex: none; }
+.seat.is-changed > .token--character { box-shadow: 0 0 0 6px #F5C542, 0 0 28px 10px rgba(245, 197, 66, 0.85); }
+.seat-badge { position: absolute; top: -10px; right: -6px; z-index: 2; padding: 2px 8px; border-radius: 10px; background: #F5C542; color: #31153E; font: bold 16px "Noto Sans KR", sans-serif; pointer-events: none; }
+.grim-changes { padding: 10px 16px 12px; color: #F1EAD9; background: rgba(0, 0, 0, 0.75); font-size: 14px; line-height: 1.6; }
+.grim-changes__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 4px; }
+.grim-changes__head strong { color: #F5C542; }
+.grim-changes button { padding: 4px 12px; font: inherit; font-size: 13px; color: #31153E; background: #F1EAD9; border: 0; border-radius: 6px; cursor: pointer; }
+.grim-changes ul { margin: 0; padding-left: 18px; }
+/* 퀴즈 인트로: 화면 전체, 누르면 다음 문장 */
+.quiz-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+    padding: 24px 16px;
+    color: #F1EAD9;
+    background: #000 url("quiz/img/background-img2.webp");
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.quiz-intro__line {
+    max-width: 760px;
+    margin: 0;
+    font-family: var(--q-head);
+    font-size: clamp(20px, 4.2vw, 32px);
+    line-height: 1.6;
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    transition: opacity 0.6s ease, filter 0.6s ease;
+}
+.quiz-intro__line.is-hidden { opacity: 0; filter: blur(12px); }
+.quiz-intro__buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease; }
+.quiz-intro__buttons.is-hidden { opacity: 0; transform: translateY(-16px); filter: blur(6px); visibility: hidden; }
+.quiz-intro__buttons .q-button span { padding: 0.8rem 2rem; }
+.quiz-intro__skip { position: absolute; top: 16px; right: 16px; padding: 6px 14px; font: 14px "Noto Sans KR", sans-serif; color: #F1EAD9; background: rgba(0, 0, 0, 0.4); border: 1px solid #D1BB87; border-radius: 6px; text-decoration: none; }
+.quiz-intro__skip:hover { background: #F1EAD9; color: #31153E; }
+.quiz-intro__tap { position: absolute; bottom: 20px; font-size: 13px; color: #9a8577; }
+@media (prefers-reduced-motion: reduce) {
+    .quiz-intro__line, .quiz-intro__buttons { transition: opacity 0.6s ease; }
+    .quiz-intro__line.is-hidden, .quiz-intro__buttons.is-hidden { filter: none; transform: none; }
+}
 .quiz-loading { color: #fff; text-align: center; padding: 120px 16px; font-size: 18px; }
 
 /* 낮은 화면: 첫 화면 그림을 줄여 시작 버튼까지 한 화면에 */
@@ -349,7 +406,7 @@
 </nav>
 <main class="page page--quiz" id="page">
     <div class="quiz" id="quiz"><div class="quiz-loading">불러오는 중…</div></div>
-    <p class="credit" style="padding: 0 16px;">공식 퀴즈 <a href="https://quiz.bloodontheclocktower.com/" target="_blank" rel="noopener">quiz.bloodontheclocktower.com</a>을 한국어로 옮긴 비공식 번역입니다. 예시 플레이어 이름은 한국어 이름으로 바꾸었습니다.</p>
+    <p class="credit" style="padding: 0 16px;">공식 퀴즈 <a href="https://quiz.bloodontheclocktower.com/" target="_blank" rel="noopener">quiz.bloodontheclocktower.com</a>을 한국어로 옮긴 비공식 번역입니다. 예시 플레이어 이름은 한국어 이름으로 바꾸었습니다. '마스터 이야기꾼' 퀴즈는 원본에 없는, 이 도감에서 새로 만든 문제입니다.</p>
 </main>
 
 <script src="common.js"></script>
@@ -368,7 +425,9 @@
         fundamentals: { cover: "quiz-cover-default.webp", ink: "gold" },
         troublebrewing: { cover: "quiz-cover-trouble-brewing.webp", ink: "red" },
         sectsviolets: { cover: "quiz-cover-sects-violet.webp", ink: "purple" },
-        badmoonrising: { cover: "quiz-cover-bad-moon-rising.webp", ink: "orange" }
+        badmoonrising: { cover: "quiz-cover-bad-moon-rising.webp", ink: "orange" },
+        // 도감 자체 퀴즈 (원본에 없는 그룹이라 기본 표지·결과 그림)
+        master: { cover: "quiz-cover-default.webp", ink: "red", result: "fundamentals" }
     };
     var TIMES = "<svg class=\"answer__mark\" viewBox=\"0 0 352 512\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z\"/></svg>";
 
@@ -398,6 +457,7 @@
     function storeKey(quizID, index) {
         return "botcquiz_answer_" + quizID + "_" + index;
     }
+    // 답은 고른 번호 배열(한 개 고르는 문제는 [n]), 안 풀었으면 null. 저장 값은 "1" 또는 복수 선택 "1,3"
     function getAnswer(quizID, index) {
         var value = null;
         try {
@@ -405,13 +465,18 @@
         } catch (e) {
             value = memory[storeKey(quizID, index)];
         }
-        var n = parseInt(value, 10);
-        return isNaN(n) ? -1 : n;
+        var list = String(value).split(",").map(Number).filter(function (n) { return n > -1; });
+        return value !== null && value !== undefined && list.length ? list : null;
+    }
+    // 복수 선택은 정답을 모두 고르고 오답은 하나도 안 골랐을 때만 정답 (부분 점수 없음)
+    function isRight(q, selected) {
+        var want = [].concat(q.a);
+        return !!selected && selected.length === want.length && want.every(function (n) { return selected.indexOf(n) > -1; });
     }
     function setAnswer(quizID, index, answer) {
-        memory[storeKey(quizID, index)] = String(answer);
+        memory[storeKey(quizID, index)] = answer.join(",");
         try {
-            window.localStorage.setItem(storeKey(quizID, index), String(answer));
+            window.localStorage.setItem(storeKey(quizID, index), answer.join(","));
         } catch (e) { /* 메모리 값 사용 */ }
     }
     function clearAnswers(quizID) {
@@ -455,7 +520,7 @@
         12: [[50, 86], [34, 82], [20, 72], [14, 50], [20, 28], [34, 18], [50, 14], [66, 18], [80, 28], [86, 50], [80, 72], [66, 82]]
     };
 
-    function seatHtml(player, index, count, fabled) {
+    function seatHtml(player, index, count, fabled, changed) {
         var size = 138;
         var angle = 360 / count * index;
         var pos;
@@ -484,7 +549,8 @@
             return "width:" + px + "px;height:" + px + "px;bottom:" + bottom + "%;left:" + left + "%;margin-left:-" + (px / 2) + "px;margin-bottom:-" + (px / 2 + offset) + "px";
         }
         var edge = fabled || pos.x > 70 ? " seat--edge-right" : (pos.x < 30 ? " seat--edge-left" : "");
-        var html = "<div class=\"seat" + edge + (player.flipped ? " is-flipped" : "") + "\" style=\"" + style + "\">";
+        var html = "<div class=\"seat" + edge + (player.flipped ? " is-flipped" : "") + (changed ? " is-changed" : "") + "\" style=\"" + style + "\">";
+        if (changed) html += "<div class=\"seat-badge\">" + changed + "</div>";
         html += "<div class=\"seat-shadow\" style=\"" + place(158, 46, 50, 0) + "\"></div>";
         html += tokenHtml(player.token, "character", roleName(player.token), place(size, 50, 50, 0));
         if (!hideName) {
@@ -505,15 +571,66 @@
         return html + "</div>";
     }
 
-    function grimoireHtml(players) {
+    // 마도서 가운데 토큰(플레이어 자리에 놓이지 않는 것, 예: 역병 의사로 이야기꾼이 얻은 능력)
+    function centerHtml(center) {
+        return (center || []).map(function (c, i) {
+            var left = 50 + (i - (center.length - 1) / 2) * 16;
+            var html = "<div class=\"seat seat--center\" style=\"width:138px;height:138px;bottom:50%;left:" + left + "%;margin-left:-69px;margin-bottom:-40px\">" +
+                "<div class=\"seat-shadow\" style=\"width:158px;height:158px;left:-10px;bottom:-10px\"></div>" +
+                tokenHtml(c.token, "character", roleName(c.token), "width:138px;height:138px;left:0;bottom:0");
+            (c.reminders || []).forEach(function (r, j) {
+                html += tokenHtml(r.id, "reminder", r.text, "width:75px;height:75px;left:" + (31 + (j - ((c.reminders.length - 1) / 2)) * 80) + "px;bottom:-90px");
+            });
+            var ability = roles[c.token] ? roles[c.token].ability : "";
+            return html + (ability ? "<div class=\"seat-ability\">" + esc(ability) + "</div>" : "") + "</div>";
+        }).join("");
+    }
+
+    // 처리 전 → 처리 후에서 좌석마다 바뀐 것: 캐릭터·진영·사망/부활·알림 토큰
+    function isEvil(p) {
+        var team = roles[p.token] ? roles[p.token].team : "";
+        return (team === "minion" || team === "demon") !== !!p.flipped;
+    }
+    function seatChanges(before, after) {
+        function key(r) { return r.id + "|" + r.text; }
+        function label(r) { return (roleName(r.id) ? roleName(r.id) + ": " : "") + r.text; }
+        return after.map(function (a, i) {
+            var b = before[i] || {};
+            var items = [];
+            if (a.token !== b.token) items.push("캐릭터 변경(" + roleName(b.token) + "→" + roleName(a.token) + ")");
+            if (isEvil(a) !== isEvil(b)) items.push(isEvil(a) ? "진영 전환(선→악)" : "진영 전환(악→선)");
+            if (!!a.dead !== !!b.dead) items.push(a.dead ? "사망" : "부활");
+            var was = (b.reminders || []).map(key);
+            var now = (a.reminders || []).map(key);
+            // 알림 토큰: 뺀 것(−) 다음 더한 것(+)
+            (b.reminders || []).forEach(function (r) { if (now.indexOf(key(r)) < 0) items.push("−" + label(r)); });
+            (a.reminders || []).forEach(function (r) { if (was.indexOf(key(r)) < 0) items.push("+" + label(r)); });
+            return items;
+        });
+    }
+
+    // compare: 해설 화면의 처리 전/후 { before, after, showBefore, timeBefore, timeAfter }
+    function grimoireHtml(players, center, compare) {
+        var changes = compare ? seatChanges(compare.before, compare.after) : [];
+        var badges = [];
+        changes.forEach(function (items, i) { if (items.length) badges[i] = badges.filter(Boolean).length + 1; });
         var fabled = players.filter(function (p) { return p.fabled; });
         var seated = players.filter(function (p) { return !p.fabled; });
         var html = "<div class=\"grimoire-box\"><div class=\"grimoire\">";
-        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false); }).join("");
+        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, badges[i]); }).join("");
         if (fabled.length) {
             html += "<div class=\"fabled-row\" data-count=\"" + fabled.length + "\">" + fabled.map(function (p, i) { return seatHtml(p, i, fabled.length, true); }).join("") + "</div>";
         }
-        return html + "</div></div>";
+        html += centerHtml(center) + "</div></div>";
+        if (!compare) return html;
+        var list = changes.map(function (items, i) {
+            return items.length ? "<li>" + badges[i] + ". " + esc(compare.after[i].name) + " — " + esc(items.join(", ")) + "</li>" : "";
+        }).join("");
+        var time = compare.showBefore ? compare.timeBefore : compare.timeAfter;
+        return "<div class=\"grimoire-col\">" + html + "<div class=\"grim-changes\"><div class=\"grim-changes__head\"><strong>" +
+            (compare.showBefore ? "처리 전" : "처리 후") + "</strong>" + (time ? "<span>" + esc(time) + "</span>" : "") +
+            "<button type=\"button\" class=\"grim-toggle\">" + (compare.showBefore ? "처리 후 보기" : "처리 전 보기") + "</button></div>" +
+            (list ? "<ul>" + list + "</ul>" : "") + "</div></div>";
     }
 
     // 그리모어(1024×824)를 칸에 맞춰 축소. 넓은 화면에서는 브라우저 높이(보라 막대 제외)에도 맞춰 스크롤 없이 한 화면에 들어오게 하고, 문제 칸 높이도 같이 맞춘다.
@@ -523,14 +640,16 @@
         var stage = box.querySelector(".grimoire");
         var stacked = window.matchMedia("(max-width: 899.98px)").matches;
         var barHeight = root.querySelector(".quiz-bar").offsetHeight;
+        var list = box.parentNode.classList.contains("grimoire-col") ? box.nextElementSibling : null;
+        var below = list ? list.offsetHeight : 0;
         var scale = box.clientWidth / 1024;
-        if (!stacked) scale = Math.min(scale, (window.innerHeight - barHeight) / 824);
+        if (!stacked) scale = Math.min(scale, (window.innerHeight - barHeight - below) / 824);
         var height = Math.round(824 * scale);
         box.style.height = height + "px";
         stage.style.transform = "translateX(" + Math.max(0, (box.clientWidth - 1024 * scale) / 2) + "px) scale(" + scale + ")";
         var wrap = root.querySelector(".quiz-panel-wrap");
         if (wrap) {
-            wrap.style.height = stacked ? "" : height + "px";
+            wrap.style.height = stacked ? "" : (height + below) + "px";
         }
     }
     window.addEventListener("resize", fitGrimoire);
@@ -634,7 +753,7 @@
                 "<div class=\"quiz-card__label\">" + esc(group.label) + "</div><div class=\"quiz-card__links\">" +
                 group.items.map(function (quiz) {
                     var best = bestScore(quiz.id);
-                    return "<a href=\"#/" + quiz.id + "/question-1\">" + esc(quiz.difficulty) +
+                    return "<a href=\"#/" + quiz.id + (quiz.intro ? "/intro" : "/question-1") + "\">" + esc(quiz.difficulty) +
                         (best > -1 ? "<small>최고 " + best + "/" + quiz.questions.length + "</small>" : "") + "</a>";
                 }).join("") + "</div></div></li>";
         });
@@ -642,31 +761,43 @@
     }
 
     // single: 공유 링크로 연 문제 하나(#/<퀴즈>/q/<번호>) — 답은 퀴즈 진행에 저장하지 않는다
-    var singleAnswer = -1;
+    var singleAnswer = null;
+    var showBefore = false; // 해설 화면에서 처리 전 마도서를 보는 중
     function questionUrl(quiz, num) {
         return "https://castleq.github.io/botc-wiki-ko/quiz.html#/" + quiz.id + "/q/" + num;
     }
     function questionScreen(quiz, num, single) {
         var q = quiz.questions[num - 1];
         var selected = single ? singleAnswer : getAnswer(quiz.id, num - 1);
-        var answered = selected > -1;
+        var answered = !!selected;
+        var want = [].concat(q.a);
         var total = quiz.questions.length;
-        var html = "<div class=\"question\"><h2>문제 " + num + "/" + total + "</h2><div><h3>" + esc(q.q) + "</h3></div>";
-        html += "<ul class=\"answers" + (answered ? " is-answered" : "") + "\">";
+        var meta = [q.script, q.setup, q.timeBefore || q.time].filter(Boolean).join(" · ");
+        var html = "<div class=\"question\"><h2>문제 " + num + "/" + total + "</h2><div>" +
+            (meta ? "<p class=\"question__meta\">" + esc(meta) + "</p>" : "") + "<h3>" + esc(q.q) + "</h3>" +
+            (q.multi ? "<p class=\"question__hint\">해당하는 것을 모두 고른 뒤 [답 확인]을 누르세요.</p>" : "") + "</div>";
+        html += "<ul class=\"answers" + (q.multi ? " answers--multi" : "") + (answered ? " is-answered" : "") + "\">";
         q.o.forEach(function (text, i) {
+            var picked = answered && selected.indexOf(i) > -1;
+            var wrong = picked && want.indexOf(i) < 0;
             var cls = "answer";
-            if (i === q.a) cls += " is-correct";
-            if (i === selected) cls += " is-selected";
-            if (answered && i === selected && i !== q.a) cls += " is-wrong";
-            html += "<div class=\"" + cls + "\"><input type=\"radio\" name=\"answer\" id=\"item-" + i + "\" value=\"" + i + "\"" + (answered ? " disabled" : "") + (i === selected ? " checked" : "") + ">" +
-                (answered && i === selected && i !== q.a ? TIMES : "") +
+            if (want.indexOf(i) > -1) cls += " is-correct";
+            if (picked) cls += " is-selected";
+            if (wrong) cls += " is-wrong";
+            html += "<div class=\"" + cls + "\"><input type=\"" + (q.multi ? "checkbox" : "radio") + "\" name=\"answer\" id=\"item-" + i + "\" value=\"" + i + "\"" + (answered ? " disabled" : "") + (picked ? " checked" : "") + ">" +
+                (wrong ? TIMES : "") +
                 "<label for=\"item-" + i + "\">" + esc(text) + "</label></div>";
         });
         html += "</ul>";
+        if (q.multi && !answered) {
+            html += "<div class=\"question__next\">" + button(window.location.hash, "답 확인", false, true) + "</div></div>";
+            return html;
+        }
         if (answered) {
-            var right = selected === q.a;
+            var right = isRight(q, selected);
             html += "<h2 class=\"answer-result " + (right ? "is-correct" : "is-wrong") + "\">" + (right ? "정답!" : "오답") + "</h2>";
             html += "<p class=\"answer-reason\">" + esc(q.r) + "</p>";
+            if (q.refs && q.refs.length) html += "<ul class=\"answer-refs\">" + q.refs.map(function (ref) { return "<li>" + refHtml(ref) + "</li>"; }).join("") + "</ul>";
             if (!right) {
                 html += "<button type=\"button\" class=\"ask\" aria-expanded=\"false\"><span class=\"ask__emoji\" aria-hidden=\"true\">🤔</span>" +
                     "<span class=\"ask__text\">왜 틀렸는지 모르겠어요</span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
@@ -684,6 +815,74 @@
         return html;
     }
 
+    // 근거 한 줄: "[이름](주소) — 설명" 꼴의 링크만 살리고 나머지는 글자 그대로
+    function refHtml(ref) {
+        return esc(ref).replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g, function (all, text, url) {
+            return "<a href=\"" + url.replace("https://castleq.github.io/botc-wiki-ko/", "") + "\" target=\"_blank\" rel=\"noopener\">" + text + "</a>";
+        });
+    }
+
+    // 문제 화면의 마도서: 답을 고른 뒤 처리 후 마도서가 있으면 그것을 (바뀐 좌석 강조)
+    function questionGrimoire(q, answered) {
+        if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center);
+        return grimoireHtml(showBefore ? q.players : q.playersAfter, q.center, {
+            before: q.players, after: q.playersAfter, showBefore: showBefore, timeBefore: q.timeBefore, timeAfter: q.timeAfter
+        });
+    }
+
+    // 퀴즈 인트로: 한 번에 한 문장, 누르면 다음. 처음 시작할 때만(카드에서 들어올 때) 보여 준다
+    function introScreen(quiz) {
+        var seen = !!storeGet("botcquiz_intro_" + quiz.id);
+        var start = "#/" + quiz.id + "/question-1";
+        return "<div class=\"quiz-intro\" role=\"dialog\" aria-label=\"퀴즈 소개\" tabindex=\"-1\">" +
+            (seen ? "<a class=\"quiz-intro__skip\" href=\"" + start + "\">건너뛰기</a>" : "") +
+            "<p class=\"quiz-intro__line is-hidden\" aria-live=\"polite\"></p>" +
+            "<div class=\"quiz-intro__buttons is-hidden\">" + quiz.intro.buttons.map(function (label) { return button(start, label, true, false); }).join("") + "</div>" +
+            "<div class=\"quiz-intro__tap\">화면을 누르면 다음으로 넘어갑니다</div></div>";
+    }
+    var introKeys = null;
+    function bindIntro(quiz) {
+        var box = root.querySelector(".quiz-intro");
+        if (!box) return;
+        var lines = quiz.intro.lines.concat(quiz.intro.question);
+        var line = box.querySelector(".quiz-intro__line");
+        var buttons = box.querySelector(".quiz-intro__buttons");
+        var index = -1;
+        var busy = false;
+        function next() {
+            if (busy || index >= lines.length) return;
+            index += 1;
+            if (index === lines.length) {
+                // 마지막 문장은 남겨 두고 버튼만 나타나게
+                storeSet("botcquiz_intro_" + quiz.id, "1");
+                buttons.classList.remove("is-hidden");
+                box.querySelector(".quiz-intro__tap").hidden = true;
+                buttons.querySelector("a").focus();
+                return;
+            }
+            busy = true;
+            var first = index === 0;
+            line.classList.add("is-hidden");
+            setTimeout(function () {
+                line.textContent = lines[index];
+                line.classList.remove("is-hidden");
+                busy = false;
+            }, first ? 30 : 600);
+        }
+        box.addEventListener("click", function (event) {
+            if (!event.target.closest("a")) next();
+        });
+        introKeys = function (event) {
+            if ((event.key === " " || event.key === "Enter") && !event.target.closest("a")) {
+                event.preventDefault();
+                next();
+            }
+        };
+        document.addEventListener("keydown", introKeys);
+        box.focus();
+        next();
+    }
+
     function playScreen(quiz, players, content, leaveLabel, extra) {
         return bar(quizName(quiz)) + "<div class=\"quiz-screen quiz-play\">" + (extra || grimoireHtml(players)) +
             "<div class=\"quiz-panel-wrap\"><div class=\"quiz-panel\">" +
@@ -696,20 +895,21 @@
         var answeredCount = 0;
         quiz.questions.forEach(function (q, i) {
             var a = getAnswer(quiz.id, i);
-            if (a > -1) answeredCount += 1;
-            if (a === q.a) score += 1;
+            if (a) answeredCount += 1;
+            if (a && isRight(q, a)) score += 1;
         });
         var result = quiz.results[score] || { text: "", token: "" };
         if (score > bestScore(quiz.id)) storeSet("botcquiz_best_" + quiz.id, String(score));
         var name = playerName();
         var content = "<div class=\"quiz-result\"><h2>" + (name ? esc(name) + "님의 " : "") + "점수<br>" + score + "/" + answeredCount + "</h2><div><h3>" + esc(result.text) + "</h3></div>" +
             "<div class=\"quiz-result__token\"><div class=\"shadow\"></div>" + tokenHtml(result.token, "character", roleName(result.token), "") + "</div>" +
-            "<div class=\"quiz-share\">" + button(window.location.hash, "결과 공유하기", true, true) + "<div class=\"quiz-share__done\" aria-live=\"polite\"></div></div></div>";
+            "<div class=\"quiz-share\">" + button(window.location.hash, "결과 공유하기", true, true) + "<div class=\"quiz-share__done\" aria-live=\"polite\"></div></div>" +
+            button("#/" + quiz.id + "/question-1", "다시 도전하기", true, true) + "</div>";
         shareData = {
             text: "[이야기꾼 퀴즈] " + (name || "익명") + "님은 " + quizName(quiz) + "에서 " + score + "/" + quiz.questions.length + "점입니다.",
             url: "https://castleq.github.io/botc-wiki-ko/quiz.html#/" + quiz.id + "/score/" + score + "/" + encodeURIComponent(name || "익명")
         };
-        var bg = "<div class=\"grimoire-box result-box\"><div class=\"grimoire\" style=\"background:url('" + IMG + "result-" + quiz.groupKey + ".webp') center / cover\"></div></div>";
+        var bg = "<div class=\"grimoire-box result-box\"><div class=\"grimoire\" style=\"background:url('" + IMG + "result-" + ((COVERS[quiz.groupKey] || {}).result || quiz.groupKey) + ".webp') center / cover\"></div></div>";
         return playScreen(quiz, [], content, "다른 퀴즈 풀기", bg);
     }
 
@@ -758,6 +958,9 @@
         var quiz = Object.prototype.hasOwnProperty.call(quizzes, parts[0]) ? quizzes[parts[0]] : null;
         var html;
         shareData = null;
+        if (introKeys) document.removeEventListener("keydown", introKeys);
+        introKeys = null;
+        if (!render.keep) showBefore = false;
         if (!hash) {
             html = homeScreen();
         } else if (quiz && parts[1] === "score") {
@@ -772,6 +975,8 @@
             // 예전(두 사람 비교) 공유 링크는 첫 화면으로
             window.location.replace("#/");
             return;
+        } else if (quiz && quiz.intro && parts[1] === "intro") {
+            html = introScreen(quiz);
         } else if (hash === "select") {
             html = selectScreen();
         } else if (quiz && /^question-\d+$/.test(parts[1] || "")) {
@@ -785,16 +990,16 @@
             }
             render.keep = false;
             var q = quiz.questions[num - 1];
-            html = playScreen(quiz, q.players, questionScreen(quiz, num), "현재 퀴즈 나가기");
+            html = playScreen(quiz, null, questionScreen(quiz, num), "현재 퀴즈 나가기", questionGrimoire(q, !!getAnswer(quiz.id, num - 1)));
         } else if (quiz && parts[1] === "q" && /^\d+$/.test(parts[2] || "") && parts[2] >= 1 && parts[2] <= quiz.questions.length) {
-            if (!render.keep) singleAnswer = -1;
+            if (!render.keep) singleAnswer = null;
             render.keep = false;
             var one = parseInt(parts[2], 10);
-            html = playScreen(quiz, quiz.questions[one - 1].players, questionScreen(quiz, one, true), "다른 퀴즈 풀기");
+            html = playScreen(quiz, null, questionScreen(quiz, one, true), "다른 퀴즈 풀기", questionGrimoire(quiz.questions[one - 1], !!singleAnswer));
         } else if (quiz && parts[1] === "results") {
             // 원본: 안 푼 문제가 있으면 그 문제로
             for (var i = 0; i < quiz.questions.length; i++) {
-                if (getAnswer(quiz.id, i) < 0) {
+                if (!getAnswer(quiz.id, i)) {
                     window.location.replace("#/" + quiz.id + "/question-" + (i + 1));
                     return;
                 }
@@ -812,28 +1017,58 @@
         bindAnswers();
         bindHome();
         bindShare();
+        if (quiz && parts[1] === "intro") bindIntro(quiz);
     }
 
     function bindAnswers() {
         var list = root.querySelector(".answers");
         if (!list) return;
-        list.addEventListener("change", function (event) {
-            var parts = window.location.hash.replace(/^#\/?/, "").split("/");
-            if (parts[1] === "q") {
-                singleAnswer = parseInt(event.target.value, 10);
-            } else {
-                setAnswer(parts[0], parseInt(parts[1].slice(9), 10) - 1, parseInt(event.target.value, 10));
+        var multi = list.classList.contains("answers--multi");
+        var check = multi ? root.querySelector(".question__next .q-button") : null;
+        function picked() {
+            return Array.prototype.map.call(list.querySelectorAll("input:checked"), function (input) { return parseInt(input.value, 10); });
+        }
+        list.addEventListener("change", function () {
+            if (!multi) {
+                save(picked());
+            } else if (check) {
+                check.setAttribute("aria-disabled", picked().length ? "false" : "true");
+                check.tabIndex = picked().length ? 0 : -1;
             }
-            var panel = root.querySelector(".quiz-panel");
-            var scrollTop = panel ? panel.scrollTop : 0;
-            // 같은 문제를 다시 그리되 1번 문제의 초기화는 하지 않고, 화면 전환 효과도 없이
-            render.keep = true;
-            render();
-            var screen = root.querySelector(".quiz-screen");
-            if (screen) screen.style.animation = "none";
-            var newPanel = root.querySelector(".quiz-panel");
-            if (newPanel) newPanel.scrollTop = scrollTop;
         });
+        if (check) {
+            check.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (picked().length) save(picked());
+            });
+        }        var toggle = root.querySelector(".grim-toggle");
+        if (toggle) {
+            toggle.addEventListener("click", function () {
+                showBefore = !showBefore;
+                redraw();
+            });
+        }
+    }
+    // 고른 답 저장 → 같은 화면을 해설과 함께 다시 그리기
+    function save(answer) {
+        var parts = window.location.hash.replace(/^#\/?/, "").split("/");
+        if (parts[1] === "q") {
+            singleAnswer = answer;
+        } else {
+            setAnswer(parts[0], parseInt(parts[1].slice(9), 10) - 1, answer);
+        }
+        redraw();
+    }
+    function redraw() {
+        var panel = root.querySelector(".quiz-panel");
+        var scrollTop = panel ? panel.scrollTop : 0;
+        // 같은 문제를 다시 그리되 1번 문제의 초기화는 하지 않고, 화면 전환 효과도 없이
+        render.keep = true;
+        render();
+        var screen = root.querySelector(".quiz-screen");
+        if (screen) screen.style.animation = "none";
+        var newPanel = root.querySelector(".quiz-panel");
+        if (newPanel) newPanel.scrollTop = scrollTop;
     }
 
     window.addEventListener("hashchange", function () {
