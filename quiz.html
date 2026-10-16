@@ -294,6 +294,34 @@
 .quiz-card__links small { display: block; font-family: "Noto Sans KR", sans-serif; font-size: 12px; color: #9a8577; }
 .quiz-share { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .quiz-share__done { min-height: 1.2em; font-size: 13px; color: var(--q-success); }
+/* 오답일 때: 이 문제만 따로 여는 링크를 나눠 토론 */
+.ask {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: calc(100% - 8px);
+    margin: 4px 4px 8px;
+    padding: 10px 15px;
+    font: inherit;
+    line-height: 1.5;
+    text-align: left;
+    color: #5C1F22;
+    background: #F1EBDC;
+    border: solid 2px #BDA89A;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+.ask:hover, .ask:focus-visible { background: #e9dcc4; box-shadow: 0 2px 6px rgba(92, 31, 34, 0.18); }
+.ask { gap: 6px; }
+.ask__emoji { font-size: 1em; line-height: 1; }
+.ask__text { flex: 1; font-weight: bold; }
+.ask__arrow { color: #7B5D4E; transition: transform 0.2s; }
+.ask:hover .ask__arrow { transform: translateX(3px); }
+.ask-box { margin: 0 0 8px; padding: 10px 12px; background: #fff; border: 1px dashed #BDA89A; border-radius: 10px; font-size: 13px; }
+.ask-box input { width: 100%; padding: 6px 8px; margin: 6px 0; font: inherit; font-size: 12.5px; color: #5C1F22; border: 1px solid #BDA89A; background: #FAF6E6; }
+.ask-box button { padding: 6px 14px; font: inherit; font-size: 13px; color: #fff; background: #7B5D4E; border: 0; border-radius: 6px; cursor: pointer; }
+.ask-box button:hover { background: var(--q-primary); }
+.ask-box__done { margin-left: 8px; color: var(--q-success); }
 .quiz-loading { color: #fff; text-align: center; padding: 120px 16px; font-size: 18px; }
 
 /* 낮은 화면: 첫 화면 그림을 줄여 시작 버튼까지 한 화면에 */
@@ -613,9 +641,14 @@
         return html + "</ul></div>";
     }
 
-    function questionScreen(quiz, num) {
+    // single: 공유 링크로 연 문제 하나(#/<퀴즈>/q/<번호>) — 답은 퀴즈 진행에 저장하지 않는다
+    var singleAnswer = -1;
+    function questionUrl(quiz, num) {
+        return "https://castleq.github.io/botc-wiki-ko/quiz.html#/" + quiz.id + "/q/" + num;
+    }
+    function questionScreen(quiz, num, single) {
         var q = quiz.questions[num - 1];
-        var selected = getAnswer(quiz.id, num - 1);
+        var selected = single ? singleAnswer : getAnswer(quiz.id, num - 1);
         var answered = selected > -1;
         var total = quiz.questions.length;
         var html = "<div class=\"question\"><h2>문제 " + num + "/" + total + "</h2><div><h3>" + esc(q.q) + "</h3></div>";
@@ -634,6 +667,17 @@
             var right = selected === q.a;
             html += "<h2 class=\"answer-result " + (right ? "is-correct" : "is-wrong") + "\">" + (right ? "정답!" : "오답") + "</h2>";
             html += "<p class=\"answer-reason\">" + esc(q.r) + "</p>";
+            if (!right) {
+                html += "<button type=\"button\" class=\"ask\" aria-expanded=\"false\"><span class=\"ask__emoji\" aria-hidden=\"true\">🤔</span>" +
+                    "<span class=\"ask__text\">왜 틀렸는지 모르겠어요</span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
+                    "<div class=\"ask-box\" hidden>이 문제만 바로 열리는 링크예요. 단톡방에 올리고 같이 토론해 보세요!" +
+                    "<input type=\"text\" readonly value=\"" + esc(questionUrl(quiz, num)) + "\" aria-label=\"이 문제 링크\">" +
+                    "<button type=\"button\">링크 공유하기</button><span class=\"ask-box__done\" aria-live=\"polite\"></span></div>";
+            }
+        }
+        if (single) {
+            html += "<div class=\"question__next\">" + button("quiz.html", "이 퀴즈 처음부터 풀기", answered, true) + "</div></div>";
+            return html;
         }
         var nextHref = num < total ? "#/" + quiz.id + "/question-" + (num + 1) : "#/" + quiz.id + "/results";
         html += "<div class=\"question__next\">" + button(answered ? nextHref : window.location.hash, num < total ? "다음" : "완료!", answered, true) + "</div></div>";
@@ -671,25 +715,40 @@
 
     // 결과 공유: 휴대폰은 공유 창, 아니면 복사
     var shareData = null;
+    function share(data, done) {
+        if (navigator.share) {
+            navigator.share({ title: "이야기꾼 퀴즈", text: data.text, url: data.url }).catch(function () { /* 취소 */ });
+            return;
+        }
+        var all = data.text + " " + data.url;
+        var copied = navigator.clipboard ? navigator.clipboard.writeText(all) : Promise.reject();
+        copied.then(function () {
+            done.textContent = "복사했어요! 단톡방에 붙여 넣어 보세요.";
+        }, function () {
+            window.prompt("아래 문구를 복사하세요", all);
+        });
+    }
     function bindShare() {
         var link = root.querySelector(".quiz-share .q-button");
-        if (!link || !shareData) return;
-        var done = root.querySelector(".quiz-share__done");
-        var data = shareData;
-        link.addEventListener("click", function (event) {
-            event.preventDefault();
-            if (navigator.share) {
-                navigator.share({ title: "이야기꾼 퀴즈", text: data.text, url: data.url }).catch(function () { /* 취소 */ });
-                return;
-            }
-            var all = data.text + " " + data.url;
-            var copied = navigator.clipboard ? navigator.clipboard.writeText(all) : Promise.reject();
-            copied.then(function () {
-                done.textContent = "복사했어요! 단톡방에 붙여 넣어 보세요.";
-            }, function () {
-                window.prompt("아래 문구를 복사하세요", all);
+        if (link && shareData) {
+            var data = shareData;
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                share(data, root.querySelector(".quiz-share__done"));
             });
-        });
+        }
+        var ask = root.querySelector(".ask");
+        if (ask) {
+            var box = root.querySelector(".ask-box");
+            ask.addEventListener("click", function () {
+                box.hidden = !box.hidden;
+                ask.setAttribute("aria-expanded", box.hidden ? "false" : "true");
+                if (!box.hidden) box.querySelector("input").select();
+            });
+            box.querySelector("button").addEventListener("click", function () {
+                share({ text: "[이야기꾼 퀴즈] 이 문제, 왜 답이 이거일까요? 🤔 같이 풀어 보고 이야기해요!", url: box.querySelector("input").value }, box.querySelector(".ask-box__done"));
+            });
+        }
     }
 
     // ── 주소(#/…)에 따라 화면 그리기 ──
@@ -727,6 +786,11 @@
             render.keep = false;
             var q = quiz.questions[num - 1];
             html = playScreen(quiz, q.players, questionScreen(quiz, num), "현재 퀴즈 나가기");
+        } else if (quiz && parts[1] === "q" && /^\d+$/.test(parts[2] || "") && parts[2] >= 1 && parts[2] <= quiz.questions.length) {
+            if (!render.keep) singleAnswer = -1;
+            render.keep = false;
+            var one = parseInt(parts[2], 10);
+            html = playScreen(quiz, quiz.questions[one - 1].players, questionScreen(quiz, one, true), "다른 퀴즈 풀기");
         } else if (quiz && parts[1] === "results") {
             // 원본: 안 푼 문제가 있으면 그 문제로
             for (var i = 0; i < quiz.questions.length; i++) {
@@ -755,8 +819,11 @@
         if (!list) return;
         list.addEventListener("change", function (event) {
             var parts = window.location.hash.replace(/^#\/?/, "").split("/");
-            var num = parseInt(parts[1].slice(9), 10);
-            setAnswer(parts[0], num - 1, parseInt(event.target.value, 10));
+            if (parts[1] === "q") {
+                singleAnswer = parseInt(event.target.value, 10);
+            } else {
+                setAnswer(parts[0], parseInt(parts[1].slice(9), 10) - 1, parseInt(event.target.value, 10));
+            }
             var panel = root.querySelector(".quiz-panel");
             var scrollTop = panel ? panel.scrollTop : 0;
             // 같은 문제를 다시 그리되 1번 문제의 초기화는 하지 않고, 화면 전환 효과도 없이
