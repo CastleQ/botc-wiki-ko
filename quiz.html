@@ -323,7 +323,6 @@
 .ask-box button:hover { background: var(--q-primary); }
 .ask-box__done { margin-left: 8px; color: var(--q-success); }
 /* 복수 선택 문항 · 문항 정보 줄 · 근거 링크 */
-.question__meta { margin: 0 0 6px; font-size: 13px; color: #7B5D4E; line-height: 1.5; }
 .question__hint { margin: 6px 0 0; font-size: 13px; font-weight: bold; color: #7B5D4E; }
 .answers--multi .answer label::before { content: "☐ "; }
 .answers--multi .answer:has(input:checked) label::before { content: "☑ "; }
@@ -609,7 +608,7 @@
         });
     }
 
-    // compare: 해설 화면의 처리 전/후 { before, after, showBefore, timeBefore, timeAfter }
+    // compare: 해설 화면의 처리 전/후 { before, after, showBefore }
     function grimoireHtml(players, center, compare) {
         var changes = compare ? seatChanges(compare.before, compare.after) : [];
         var badges = [];
@@ -626,9 +625,8 @@
         var list = changes.map(function (items, i) {
             return items.length ? "<li>" + badges[i] + ". " + esc(compare.after[i].name) + " — " + esc(items.join(", ")) + "</li>" : "";
         }).join("");
-        var time = compare.showBefore ? compare.timeBefore : compare.timeAfter;
         return "<div class=\"grimoire-col\">" + html + "<div class=\"grim-changes\"><div class=\"grim-changes__head\"><strong>" +
-            (compare.showBefore ? "처리 전" : "처리 후") + "</strong>" + (time ? "<span>" + esc(time) + "</span>" : "") +
+            (compare.showBefore ? "처리 전" : "처리 후") + "</strong>" +
             "<button type=\"button\" class=\"grim-toggle\">" + (compare.showBefore ? "처리 후 보기" : "처리 전 보기") + "</button></div>" +
             (list ? "<ul>" + list + "</ul>" : "") + "</div></div>";
     }
@@ -772,9 +770,8 @@
         var answered = !!selected;
         var want = [].concat(q.a);
         var total = quiz.questions.length;
-        var meta = [q.script, q.setup, q.timeBefore || q.time].filter(Boolean).join(" · ");
         var html = "<div class=\"question\"><h2>문제 " + num + "/" + total + "</h2><div>" +
-            (meta ? "<p class=\"question__meta\">" + esc(meta) + "</p>" : "") + "<h3>" + esc(q.q) + "</h3>" +
+            "<h3>" + esc(q.q) + "</h3>" +
             (q.multi ? "<p class=\"question__hint\">해당하는 것을 모두 고른 뒤 [답 확인]을 누르세요.</p>" : "") + "</div>";
         html += "<ul class=\"answers" + (q.multi ? " answers--multi" : "") + (answered ? " is-answered" : "") + "\">";
         q.o.forEach(function (text, i) {
@@ -826,7 +823,7 @@
     function questionGrimoire(q, answered) {
         if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center);
         return grimoireHtml(showBefore ? q.players : q.playersAfter, q.center, {
-            before: q.players, after: q.playersAfter, showBefore: showBefore, timeBefore: q.timeBefore, timeAfter: q.timeAfter
+            before: q.players, after: q.playersAfter, showBefore: showBefore
         });
     }
 
