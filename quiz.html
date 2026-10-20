@@ -8,7 +8,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="시계탑에 흐른 피(시계피) wiki 페이지 한글">
 <meta property="og:title" content="이야기꾼 퀴즈 - 시계피 wiki">
-<meta property="og:description" content="게임 기본기부터 에디션별 상황까지, 이야기꾼 실력을 시험하는 퀴즈 231문제 (공식 퀴즈 한국어판 + 마스터 이야기꾼 초고난도)">
+<meta property="og:description" content="게임 기본기부터 에디션별 상황까지, 이야기꾼 실력을 시험하는 퀴즈 230문제 (공식 퀴즈 한국어판 + 마스터 이야기꾼 초고난도)">
 <meta property="og:url" content="https://castleq.github.io/botc-wiki-ko/quiz.html">
 <meta property="og:image" content="https://castleq.github.io/botc-wiki-ko/og/quiz.jpg">
 <meta property="og:image:width" content="400">
@@ -183,7 +183,7 @@
     color: #5C1F22;
 }
 .question h2 { text-align: center; padding-bottom: 5px; margin: 0.83em 10px 0; font-family: var(--q-head); font-size: 160%; }
-.question h3 { font-weight: normal; margin: 2px 0; font-size: 1.17em; line-height: 1.5; }
+.question h3 { font-weight: normal; margin: 2px 0; font-size: 1.17em; line-height: 1.5; white-space: pre-line; }
 .answers { width: 100%; padding: 0; margin: 1em 0; }
 .answer { margin: 4px; position: relative; border: solid 2px #BDA89A; }
 .answer label { padding: 10px 15px; display: block; cursor: pointer; line-height: 1.5; }
@@ -317,28 +317,23 @@
 .ask__text { flex: 1; font-weight: bold; }
 .ask__arrow { color: #7B5D4E; transition: transform 0.2s; }
 .ask:hover .ask__arrow { transform: translateX(3px); }
+.ask[aria-expanded="true"]:hover .ask__arrow { transform: translateY(3px); }
 .ask-box { margin: 0 0 8px; padding: 10px 12px; background: #fff; border: 1px dashed #BDA89A; border-radius: 10px; font-size: 13px; }
 .ask-box input { width: 100%; padding: 6px 8px; margin: 6px 0; font: inherit; font-size: 12.5px; color: #5C1F22; border: 1px solid #BDA89A; background: #FAF6E6; }
 .ask-box button { padding: 6px 14px; font: inherit; font-size: 13px; color: #fff; background: #7B5D4E; border: 0; border-radius: 6px; cursor: pointer; }
 .ask-box button:hover { background: var(--q-primary); }
 .ask-box__done { margin-left: 8px; color: var(--q-success); }
 /* 복수 선택 문항 · 문항 정보 줄 · 근거 링크 */
-.question__hint { margin: 6px 0 0; font-size: 13px; font-weight: bold; color: #7B5D4E; }
 .answers--multi .answer label::before { content: "☐ "; }
 .answers--multi .answer:has(input:checked) label::before { content: "☑ "; }
 .answers:not(.is-answered) .answer:has(input:checked) { background-color: #BDA89A; color: #fff; }
 .answer-refs { margin: 0 0 8px; padding-left: 18px; font-size: 13px; line-height: 1.6; }
 .answer-refs a { color: #5C1F22; }
 /* 해설 화면: 처리 후 마도서에서 바뀐 좌석 강조 + 바뀐 내용 목록 */
-.grimoire-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
-.grimoire-col .grimoire-box { flex: none; }
+.grimoire-time { position: absolute; top: 12px; left: 12px; z-index: 5; padding: 4px 12px; border-radius: 6px; background: rgba(0, 0, 0, 0.7); color: #F1EAD9; font: bold 15px "Noto Sans KR", sans-serif; pointer-events: none; }
 .seat.is-changed > .token--character { box-shadow: 0 0 0 6px #F5C542, 0 0 28px 10px rgba(245, 197, 66, 0.85); }
-.seat-badge { position: absolute; top: -10px; right: -6px; z-index: 2; padding: 2px 8px; border-radius: 10px; background: #F5C542; color: #31153E; font: bold 16px "Noto Sans KR", sans-serif; pointer-events: none; }
-.grim-changes { padding: 10px 16px 12px; color: #F1EAD9; background: rgba(0, 0, 0, 0.75); font-size: 14px; line-height: 1.6; }
-.grim-changes__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 4px; }
-.grim-changes__head strong { color: #F5C542; }
-.grim-changes button { padding: 4px 12px; font: inherit; font-size: 13px; color: #31153E; background: #F1EAD9; border: 0; border-radius: 6px; cursor: pointer; }
-.grim-changes ul { margin: 0; padding-left: 18px; }
+.grim-toggle { position: absolute; right: 12px; bottom: 12px; z-index: 5; padding: 6px 14px; font: bold 15px "Noto Sans KR", sans-serif; color: #31153E; background: #F5C542; border: 0; border-radius: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); cursor: pointer; }
+.grim-toggle:hover, .grim-toggle:focus-visible { background: #F1EAD9; }
 /* 퀴즈 인트로: 화면 전체, 누르면 다음 문장 */
 .quiz-intro {
     position: fixed;
@@ -365,6 +360,7 @@
     text-align: center;
     word-break: keep-all;
     overflow-wrap: break-word;
+    white-space: pre-line;
     transition: opacity 0.6s ease, filter 0.6s ease;
 }
 .quiz-intro__line.is-hidden { opacity: 0; filter: blur(12px); }
@@ -493,10 +489,12 @@
 
     // ── 토큰 그리기 ──
     var curveId = 0;
-    function tokenHtml(id, kind, label, style) {
+    // alt: 진영 색이 반대인 그림(<id>_1.webp)
+    function tokenHtml(id, kind, label, style, alt) {
         curveId += 1;
         var curve = "qc" + curveId;
-        var icon = id ? "<img class=\"token__icon\" src=\"" + W.iconUrl(id) + "\" alt=\"\" loading=\"lazy\">" : "";
+        var src = alt ? W.iconUrl(id).replace(/_0\.webp$/, "_1.webp") : W.iconUrl(id);
+        var icon = id ? "<img class=\"token__icon\" src=\"" + src + "\" alt=\"\" loading=\"lazy\">" : "";
         // PG+ 마도서 토큰과 같은 아래쪽 곡선 (viewBox 150)
         var name = label ? "<svg class=\"token__name\" viewBox=\"0 0 150 150\" aria-hidden=\"true\"><path id=\"" + curve + "\" d=\"M 13 75 C 13 160, 138 160, 138 75\" fill=\"none\"/>" +
             "<text text-anchor=\"middle\"><textPath href=\"#" + curve + "\" startOffset=\"50%\">" + esc(label) + "</textPath></text></svg>" : "";
@@ -548,10 +546,9 @@
             return "width:" + px + "px;height:" + px + "px;bottom:" + bottom + "%;left:" + left + "%;margin-left:-" + (px / 2) + "px;margin-bottom:-" + (px / 2 + offset) + "px";
         }
         var edge = fabled || pos.x > 70 ? " seat--edge-right" : (pos.x < 30 ? " seat--edge-left" : "");
-        var html = "<div class=\"seat" + edge + (player.flipped ? " is-flipped" : "") + (changed ? " is-changed" : "") + "\" style=\"" + style + "\">";
-        if (changed) html += "<div class=\"seat-badge\">" + changed + "</div>";
+        var html = "<div class=\"seat" + edge + (player.flipped && !player.altIcon ? " is-flipped" : "") + (changed ? " is-changed" : "") + "\" style=\"" + style + "\">";
         html += "<div class=\"seat-shadow\" style=\"" + place(158, 46, 50, 0) + "\"></div>";
-        html += tokenHtml(player.token, "character", roleName(player.token), place(size, 50, 50, 0));
+        html += tokenHtml(player.token, "character", roleName(player.token), place(size, 50, 50, 0), player.altIcon);
         if (!hideName) {
             html += "<div class=\"seat-name\">" + esc(player.name) + "</div>";
         }
@@ -609,26 +606,22 @@
     }
 
     // compare: 해설 화면의 처리 전/후 { before, after, showBefore }
-    function grimoireHtml(players, center, compare) {
+    function grimoireHtml(players, center, compare, time) {
         var changes = compare ? seatChanges(compare.before, compare.after) : [];
-        var badges = [];
-        changes.forEach(function (items, i) { if (items.length) badges[i] = badges.filter(Boolean).length + 1; });
         var fabled = players.filter(function (p) { return p.fabled; });
         var seated = players.filter(function (p) { return !p.fabled; });
-        var html = "<div class=\"grimoire-box\"><div class=\"grimoire\">";
-        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, badges[i]); }).join("");
+        var html = "<div class=\"grimoire-box\">" + (time ? "<div class=\"grimoire-time\">" + esc(time) + "</div>" : "") + "<div class=\"grimoire\">";
+        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, changes[i] && changes[i].length > 0); }).join("");
         if (fabled.length) {
             html += "<div class=\"fabled-row\" data-count=\"" + fabled.length + "\">" + fabled.map(function (p, i) { return seatHtml(p, i, fabled.length, true); }).join("") + "</div>";
         }
-        html += centerHtml(center) + "</div></div>";
-        if (!compare) return html;
-        var list = changes.map(function (items, i) {
-            return items.length ? "<li>" + badges[i] + ". " + esc(compare.after[i].name) + " — " + esc(items.join(", ")) + "</li>" : "";
-        }).join("");
-        return "<div class=\"grimoire-col\">" + html + "<div class=\"grim-changes\"><div class=\"grim-changes__head\"><strong>" +
-            (compare.showBefore ? "처리 전" : "처리 후") + "</strong>" +
-            "<button type=\"button\" class=\"grim-toggle\">" + (compare.showBefore ? "처리 후 보기" : "처리 전 보기") + "</button></div>" +
-            (list ? "<ul>" + list + "</ul>" : "") + "</div></div>";
+        html += centerHtml(center) + "</div>";
+        if (compare) {
+            // 버튼 글은 지금 보고 있는 화면 이름 (누르면 서로 바뀜)
+            html += "<button type=\"button\" class=\"grim-toggle\" aria-label=\"" + (compare.showBefore ? "문제 보기 중, 눌러서 정답 보기" : "정답 보기 중, 눌러서 문제 보기") + "\">" +
+                (compare.showBefore ? "문제 보기" : "정답 보기") + "</button>";
+        }
+        return html + "</div>";
     }
 
     // 그리모어(1024×824)를 칸에 맞춰 축소. 넓은 화면에서는 브라우저 높이(보라 막대 제외)에도 맞춰 스크롤 없이 한 화면에 들어오게 하고, 문제 칸 높이도 같이 맞춘다.
@@ -638,16 +631,14 @@
         var stage = box.querySelector(".grimoire");
         var stacked = window.matchMedia("(max-width: 899.98px)").matches;
         var barHeight = root.querySelector(".quiz-bar").offsetHeight;
-        var list = box.parentNode.classList.contains("grimoire-col") ? box.nextElementSibling : null;
-        var below = list ? list.offsetHeight : 0;
         var scale = box.clientWidth / 1024;
-        if (!stacked) scale = Math.min(scale, (window.innerHeight - barHeight - below) / 824);
+        if (!stacked) scale = Math.min(scale, (window.innerHeight - barHeight) / 824);
         var height = Math.round(824 * scale);
         box.style.height = height + "px";
         stage.style.transform = "translateX(" + Math.max(0, (box.clientWidth - 1024 * scale) / 2) + "px) scale(" + scale + ")";
         var wrap = root.querySelector(".quiz-panel-wrap");
         if (wrap) {
-            wrap.style.height = stacked ? "" : (height + below) + "px";
+            wrap.style.height = stacked ? "" : height + "px";
         }
     }
     window.addEventListener("resize", fitGrimoire);
@@ -772,7 +763,7 @@
         var total = quiz.questions.length;
         var html = "<div class=\"question\"><h2>문제 " + num + "/" + total + "</h2><div>" +
             "<h3>" + esc(q.q) + "</h3>" +
-            (q.multi ? "<p class=\"question__hint\">해당하는 것을 모두 고른 뒤 [답 확인]을 누르세요.</p>" : "") + "</div>";
+            "</div>";
         html += "<ul class=\"answers" + (q.multi ? " answers--multi" : "") + (answered ? " is-answered" : "") + "\">";
         q.o.forEach(function (text, i) {
             var picked = answered && selected.indexOf(i) > -1;
@@ -821,10 +812,10 @@
 
     // 문제 화면의 마도서: 답을 고른 뒤 처리 후 마도서가 있으면 그것을 (바뀐 좌석 강조)
     function questionGrimoire(q, answered) {
-        if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center);
+        if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center, null, q.time);
         return grimoireHtml(showBefore ? q.players : q.playersAfter, q.center, {
             before: q.players, after: q.playersAfter, showBefore: showBefore
-        });
+        }, q.time);
     }
 
     // 퀴즈 인트로: 한 번에 한 문장, 누르면 다음. 처음 시작할 때만(카드에서 들어올 때) 보여 준다
@@ -940,6 +931,7 @@
             ask.addEventListener("click", function () {
                 box.hidden = !box.hidden;
                 ask.setAttribute("aria-expanded", box.hidden ? "false" : "true");
+                ask.querySelector(".ask__arrow").textContent = box.hidden ? "→" : "↓";
                 if (!box.hidden) box.querySelector("input").select();
             });
             box.querySelector("button").addEventListener("click", function () {
@@ -1021,7 +1013,7 @@
         var list = root.querySelector(".answers");
         if (!list) return;
         var multi = list.classList.contains("answers--multi");
-        var check = multi ? root.querySelector(".question__next .q-button") : null;
+        var check = multi && !list.classList.contains("is-answered") ? root.querySelector(".question__next .q-button") : null;
         function picked() {
             return Array.prototype.map.call(list.querySelectorAll("input:checked"), function (input) { return parseInt(input.value, 10); });
         }
