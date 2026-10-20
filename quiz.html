@@ -797,8 +797,7 @@
             html += "<h2 class=\"answer-result " + (right ? "is-correct" : "is-wrong") + "\">" + (right ? "정답!" : "오답") + "</h2>";
             html += "<p class=\"answer-reason\">" + esc(q.r) + "</p>";
             if (q.refs && q.refs.length) html += "<ul class=\"answer-refs\">" + q.refs.map(function (ref) { return "<li>" + refHtml(ref) + "</li>"; }).join("") + "</ul>";
-            // [왜 틀렸는지 모르겠어요]는 맞혔든 틀렸든 늘 보여 준다 (CastleQ 요청, 2026-10-20)
-            {
+            if (!right) {
                 html += "<button type=\"button\" class=\"ask\" aria-expanded=\"false\"><span class=\"ask__emoji\" aria-hidden=\"true\">🤔</span>" +
                     "<span class=\"ask__text\">왜 틀렸는지 모르겠어요</span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
                     "<div class=\"ask-box\" hidden>이 문제만 바로 열리는 링크예요. 단톡방에 올리고 같이 토론해 보세요!" +
