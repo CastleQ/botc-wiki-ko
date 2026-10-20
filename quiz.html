@@ -330,6 +330,7 @@
 .answer-refs { margin: 0 0 8px; padding-left: 18px; font-size: 13px; line-height: 1.6; }
 .answer-refs a { color: #5C1F22; }
 /* 해설 화면: 처리 후 마도서에서 바뀐 좌석 강조 + 바뀐 내용 목록 */
+.grimoire-time { position: absolute; top: 12px; left: 12px; z-index: 5; padding: 4px 12px; border-radius: 6px; background: rgba(0, 0, 0, 0.7); color: #F1EAD9; font: bold 15px "Noto Sans KR", sans-serif; pointer-events: none; }
 .grimoire-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .grimoire-col .grimoire-box { flex: none; }
 .seat.is-changed > .token--character { box-shadow: 0 0 0 6px #F5C542, 0 0 28px 10px rgba(245, 197, 66, 0.85); }
@@ -365,6 +366,7 @@
     text-align: center;
     word-break: keep-all;
     overflow-wrap: break-word;
+    white-space: pre-line;
     transition: opacity 0.6s ease, filter 0.6s ease;
 }
 .quiz-intro__line.is-hidden { opacity: 0; filter: blur(12px); }
@@ -609,13 +611,13 @@
     }
 
     // compare: 해설 화면의 처리 전/후 { before, after, showBefore }
-    function grimoireHtml(players, center, compare) {
+    function grimoireHtml(players, center, compare, time) {
         var changes = compare ? seatChanges(compare.before, compare.after) : [];
         var badges = [];
         changes.forEach(function (items, i) { if (items.length) badges[i] = badges.filter(Boolean).length + 1; });
         var fabled = players.filter(function (p) { return p.fabled; });
         var seated = players.filter(function (p) { return !p.fabled; });
-        var html = "<div class=\"grimoire-box\"><div class=\"grimoire\">";
+        var html = "<div class=\"grimoire-box\">" + (time ? "<div class=\"grimoire-time\">" + esc(time) + "</div>" : "") + "<div class=\"grimoire\">";
         html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, badges[i]); }).join("");
         if (fabled.length) {
             html += "<div class=\"fabled-row\" data-count=\"" + fabled.length + "\">" + fabled.map(function (p, i) { return seatHtml(p, i, fabled.length, true); }).join("") + "</div>";
@@ -795,7 +797,8 @@
             html += "<h2 class=\"answer-result " + (right ? "is-correct" : "is-wrong") + "\">" + (right ? "정답!" : "오답") + "</h2>";
             html += "<p class=\"answer-reason\">" + esc(q.r) + "</p>";
             if (q.refs && q.refs.length) html += "<ul class=\"answer-refs\">" + q.refs.map(function (ref) { return "<li>" + refHtml(ref) + "</li>"; }).join("") + "</ul>";
-            if (!right) {
+            // [왜 틀렸는지 모르겠어요]는 맞혔든 틀렸든 늘 보여 준다 (CastleQ 요청, 2026-10-20)
+            {
                 html += "<button type=\"button\" class=\"ask\" aria-expanded=\"false\"><span class=\"ask__emoji\" aria-hidden=\"true\">🤔</span>" +
                     "<span class=\"ask__text\">왜 틀렸는지 모르겠어요</span><span class=\"ask__arrow\" aria-hidden=\"true\">→</span></button>" +
                     "<div class=\"ask-box\" hidden>이 문제만 바로 열리는 링크예요. 단톡방에 올리고 같이 토론해 보세요!" +
@@ -821,10 +824,10 @@
 
     // 문제 화면의 마도서: 답을 고른 뒤 처리 후 마도서가 있으면 그것을 (바뀐 좌석 강조)
     function questionGrimoire(q, answered) {
-        if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center);
+        if (!answered || !q.playersAfter) return grimoireHtml(q.players, q.center, null, q.time);
         return grimoireHtml(showBefore ? q.players : q.playersAfter, q.center, {
             before: q.players, after: q.playersAfter, showBefore: showBefore
-        });
+        }, q.time);
     }
 
     // 퀴즈 인트로: 한 번에 한 문장, 누르면 다음. 처음 시작할 때만(카드에서 들어올 때) 보여 준다
