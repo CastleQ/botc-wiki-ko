@@ -611,7 +611,7 @@
         var fabled = players.filter(function (p) { return p.fabled; });
         var seated = players.filter(function (p) { return !p.fabled; });
         var html = "<div class=\"grimoire-box\">" + (time ? "<div class=\"grimoire-time\">" + esc(time) + "</div>" : "") + "<div class=\"grimoire\">";
-        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, changes[i] && changes[i].length > 0); }).join("");
+        html += seated.map(function (p, i) { return seatHtml(p, i, seated.length, false, changes[i] && changes[i].length > 0 && !compare.after[i].noHighlight); }).join("");
         if (fabled.length) {
             html += "<div class=\"fabled-row\" data-count=\"" + fabled.length + "\">" + fabled.map(function (p, i) { return seatHtml(p, i, fabled.length, true); }).join("") + "</div>";
         }
