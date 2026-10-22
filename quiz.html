@@ -380,6 +380,13 @@
 .quiz-next { max-width: 340px; padding: 14px 12px; text-align: center; line-height: 1.6; background: #F1EBDC; border: 2px solid #BDA89A; }
 .quiz-next p { margin: 0 0 10px; }
 .quiz-next__status { min-height: 1.2em; font-size: 13px; color: #7B5D4E; }
+.quiz-askname { max-width: 340px; margin: 0 auto 16px; padding: 14px 12px; text-align: center; background: #F1EBDC; border: 2px solid #BDA89A; color: #5C1F22; }
+.quiz-askname p { margin: 0 0 8px; }
+.quiz-askname input { width: 100%; max-width: 240px; padding: 8px 10px; font: inherit; font-size: 16px; text-align: center; color: var(--q-primary); background: #FAF6E6; border: 2px solid #BDA89A; }
+.quiz-askname__buttons { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.quiz-askname button { padding: 7px 16px; font: inherit; font-size: 14px; color: #fff; background: #7B5D4E; border: 0; border-radius: 6px; cursor: pointer; }
+.quiz-askname button.is-no { color: #7B5D4E; background: transparent; border: 1px solid #BDA89A; }
+.quiz-askname button:hover { background: var(--q-primary); color: #fff; }
 .quiz-board { padding: 0 16px 60px; color: #5C1F22; }
 .quiz-board__note { margin: 0 0 16px; color: #7B5D4E; font-size: 15px; }
 .quiz-board table { width: 100%; max-width: 560px; margin: 0 auto 24px; border-collapse: collapse; background: #F9F7F1; border: 2px solid #BDA89A; font-size: 15px; }
@@ -482,7 +489,28 @@
     }
     // 카테고리를 다 끝냈으면 기록 보내기 (사람당 최고 점수 한 줄 — 서버가 처리)
     function submitGroup(key) {
-        return rpc("wiki_submit_score", { p_category: key, p_player: playerToken(), p_name: playerName() || "익명", p_score: groupScore(key) });
+        return rpc("wiki_submit_score", { p_category: key, p_player: playerToken(), p_name: playerName(), p_score: groupScore(key) });
+    }
+    // 이름이 비어 있으면 먼저 묻는다. 입력하지 않으면(기록 안 함) null → 점수표에 기록하지 않음
+    function askName(box) {
+        if (playerName()) return Promise.resolve(playerName());
+        return new Promise(function (resolve) {
+            box.innerHTML = "<div class=\"quiz-askname\"><p>점수표에 올릴 이름을 입력하세요.</p>" +
+                "<input maxlength=\"12\" autocomplete=\"nickname\" aria-label=\"점수표에 올릴 이름\">" +
+                "<div class=\"quiz-askname__buttons\"><button type=\"button\" class=\"is-yes\">기록하기</button><button type=\"button\" class=\"is-no\">기록 안 함</button></div></div>";
+            var input = box.querySelector("input");
+            function done(name) {
+                if (name) storeSet(NAME_KEY, name);
+                box.innerHTML = "";
+                resolve(name || null);
+            }
+            box.querySelector(".is-yes").addEventListener("click", function () {
+                if (input.value.trim()) done(input.value.trim()); else input.focus();
+            });
+            box.querySelector(".is-no").addEventListener("click", function () { done(null); });
+            input.addEventListener("keydown", function (event) { if (event.key === "Enter") box.querySelector(".is-yes").click(); });
+            input.focus();
+        });
     }
 
     // ── 답 저장 (원본과 같은 키: botcquiz_answer_<퀴즈>_<번호>). 저장이 막힌 브라우저에서는 메모리에만 ──
@@ -977,8 +1005,13 @@
         var box = root.querySelector(".quiz-next[data-group]");
         if (!box) return;
         var status = box.querySelector(".quiz-next__status");
-        submitGroup(box.getAttribute("data-group")).then(function (me) {
-            status.textContent = me ? "점수표에 기록했어요 (현재 " + me.rank + "위 / " + me.count + "명)" : "";
+        askName(status).then(function (name) {
+            if (!name) return "skip";
+            status.textContent = "기록을 보내는 중…";
+            return submitGroup(box.getAttribute("data-group"));
+        }).then(function (me) {
+            if (!status.isConnected) return;
+            status.textContent = me === "skip" ? "점수표에 기록하지 않았어요." : me ? "점수표에 기록했어요 (현재 " + me.rank + "위 / " + me.count + "명)" : "";
         }).catch(function () {
             status.textContent = "기록을 보내지 못했어요. [점수표 보기]를 누르면 다시 보냅니다.";
         });
@@ -1005,7 +1038,10 @@
     function loadBoard(key) {
         var list = root.querySelector(".quiz-board__list");
         // 다 끝낸 사람은 먼저 기록을 보내고(점수표가 생기기 전에 끝낸 사람 포함), 그다음 목록·내 순위
-        var mine = groupDone(key) ? submitGroup(key).catch(function () { return null; }) : Promise.resolve(null);
+        var mine = !groupDone(key) ? Promise.resolve(null) : askName(list).then(function (name) {
+            list.textContent = "불러오는 중…";
+            return name ? submitGroup(key).catch(function () { return null; }) : null;
+        });
         mine.then(function (me) {
             return rpc("wiki_quiz_board", { p_category: key }).then(function (rows) { return [rows, me]; });
         }).then(function (data) {
