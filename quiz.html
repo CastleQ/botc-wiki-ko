@@ -374,6 +374,28 @@
     .quiz-intro__line, .quiz-intro__buttons { transition: opacity 0.6s ease; }
     .quiz-intro__line.is-hidden, .quiz-intro__buttons.is-hidden { filter: none; transform: none; }
 }
+.quiz-card__board { position: absolute; left: 0; right: 0; top: calc(100% + 18px); z-index: 1; display: flex; justify-content: center; }
+.quiz-card__board .q-button span { padding: 0.6rem 2rem; }
+/* 점수표 (서버: PG+ Supabase의 wiki_ 함수들) */
+.quiz-next { max-width: 340px; padding: 14px 12px; text-align: center; line-height: 1.6; background: #F1EBDC; border: 2px solid #BDA89A; }
+.quiz-next p { margin: 0 0 10px; }
+.quiz-next__status { min-height: 1.2em; font-size: 13px; color: #7B5D4E; }
+.quiz-askname { max-width: 340px; margin: 0 auto 16px; padding: 14px 12px; text-align: center; background: #F1EBDC; border: 2px solid #BDA89A; color: #5C1F22; }
+.quiz-askname p { margin: 0 0 8px; }
+.quiz-askname input { width: 100%; max-width: 240px; padding: 8px 10px; font: inherit; font-size: 16px; text-align: center; color: var(--q-primary); background: #FAF6E6; border: 2px solid #BDA89A; }
+.quiz-askname__buttons { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.quiz-askname button { padding: 7px 16px; font: inherit; font-size: 14px; color: #fff; background: #7B5D4E; border: 0; border-radius: 6px; cursor: pointer; }
+.quiz-askname button.is-no { color: #7B5D4E; background: transparent; border: 1px solid #BDA89A; }
+.quiz-askname button:hover { background: var(--q-primary); color: #fff; }
+.quiz-board { padding: 0 16px 60px; color: #5C1F22; }
+.quiz-board__note { margin: 0 0 16px; color: #7B5D4E; font-size: 15px; }
+.quiz-board table { width: 100%; max-width: 560px; margin: 0 auto 24px; border-collapse: collapse; background: #F9F7F1; border: 2px solid #BDA89A; font-size: 15px; }
+.quiz-board th { background: #F1EBDC; color: #7B5D4E; font-family: var(--q-head); font-weight: normal; padding: 10px 8px; }
+.quiz-board th, .quiz-board td { white-space: nowrap; }
+.quiz-board td { padding: 9px 8px; border-top: 1px solid #E2D6C3; text-align: center; }
+.quiz-board td.name { text-align: left; white-space: normal; word-break: break-all; width: 100%; }
+.quiz-board tr.is-me td { background: #F5E6B8; font-weight: bold; }
+.quiz-board tr.gap td { padding: 2px; color: #BDA89A; }
 .quiz-loading { color: #fff; text-align: center; padding: 120px 16px; font-size: 18px; }
 
 /* 낮은 화면: 첫 화면 그림을 줄여 시작 버튼까지 한 화면에 */
@@ -425,6 +447,71 @@
         master: { cover: "quiz-cover-default.webp", ink: "red", result: "fundamentals" }
     };
     var TIMES = "<svg class=\"answer__mark\" viewBox=\"0 0 352 512\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z\"/></svg>";
+
+    // ── 점수표 서버: PG+ Supabase 프로젝트의 wiki_ 함수 (공개 키는 원래 공개용, 표는 함수로만 접근) ──
+    var SB_URL = "https://kxttcvygubixhfwhvyqa.supabase.co";
+    var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4dHRjdnlndWJpeGhmd2h2eXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzOTE3NjIsImV4cCI6MjA5Nzk2Nzc2Mn0.6lo08bfZ9_RDo8V7y6H8WJJByFgfM2IYZonLRoOW7iI";
+    function rpc(name, args) {
+        return fetch(SB_URL + "/rest/v1/rpc/" + name, {
+            method: "POST",
+            headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify(args)
+        }).then(function (res) {
+            if (!res.ok) throw new Error(name + " " + res.status);
+            return res.json();
+        });
+    }
+    // 브라우저마다 한 번 만드는 무작위 번호: 점수표에서 '같은 사람'을 구분 (서버 목록에는 나가지 않음)
+    function playerToken() {
+        var token = storeGet("botcquiz_player");
+        if (!/^[0-9a-f-]{36}$/.test(token || "")) {
+            token = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() :
+                "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16 | 0;
+                    return (c === "x" ? r : (r & 3 | 8)).toString(16);
+                });
+            storeSet("botcquiz_player", token);
+        }
+        return token;
+    }
+    // 카테고리 = 그룹(기본 규칙·점철되는 혼란·…). 안의 퀴즈를 모두 한 번 이상 끝내야 점수표에 오른다
+    function groupQuizzes(key) {
+        return order.map(function (id) { return quizzes[id]; }).filter(function (q) { return q.groupKey === key; });
+    }
+    function groupDone(key) {
+        return groupQuizzes(key).every(function (q) { return bestScore(q.id) > -1; });
+    }
+    function groupScore(key) {
+        return groupQuizzes(key).reduce(function (sum, q) { return sum + Math.max(0, bestScore(q.id)); }, 0);
+    }
+    function groupTotal(key) {
+        return groupQuizzes(key).reduce(function (sum, q) { return sum + q.questions.length; }, 0);
+    }
+    // 카테고리를 다 끝냈으면 기록 보내기 (사람당 최고 점수 한 줄 — 서버가 처리)
+    function submitGroup(key) {
+        return rpc("wiki_submit_score", { p_category: key, p_player: playerToken(), p_name: playerName(), p_score: groupScore(key) });
+    }
+    // 이름이 비어 있으면 먼저 묻는다. 입력하지 않으면(기록 안 함) null → 점수표에 기록하지 않음
+    function askName(box) {
+        if (playerName()) return Promise.resolve(playerName());
+        return new Promise(function (resolve) {
+            box.innerHTML = "<div class=\"quiz-askname\"><p>점수표에 올릴 이름을 입력하세요.</p>" +
+                "<input maxlength=\"12\" autocomplete=\"nickname\" aria-label=\"점수표에 올릴 이름\">" +
+                "<div class=\"quiz-askname__buttons\"><button type=\"button\" class=\"is-yes\">기록하기</button><button type=\"button\" class=\"is-no\">기록 안 함</button></div></div>";
+            var input = box.querySelector("input");
+            function done(name) {
+                if (name) storeSet(NAME_KEY, name);
+                box.innerHTML = "";
+                resolve(name || null);
+            }
+            box.querySelector(".is-yes").addEventListener("click", function () {
+                if (input.value.trim()) done(input.value.trim()); else input.focus();
+            });
+            box.querySelector(".is-no").addEventListener("click", function () { done(null); });
+            input.addEventListener("keydown", function (event) { if (event.key === "Enter") box.querySelector(".is-yes").click(); });
+            input.focus();
+        });
+    }
 
     // ── 답 저장 (원본과 같은 키: botcquiz_answer_<퀴즈>_<번호>). 저장이 막힌 브라우저에서는 메모리에만 ──
     var memory = {};
@@ -744,7 +831,8 @@
                     var best = bestScore(quiz.id);
                     return "<a href=\"#/" + quiz.id + (quiz.intro ? "/intro" : "/question-1") + "\">" + esc(quiz.difficulty) +
                         (best > -1 ? "<small>최고 " + best + "/" + quiz.questions.length + "</small>" : "") + "</a>";
-                }).join("") + "</div></div></li>";
+                }).join("") + "</div></div>" +
+                (groupDone(group.key) ? "<div class=\"quiz-card__board\">" + button("#/board/" + group.key, "점수표 보기", true, true) + "</div>" : "") + "</li>";
         });
         return html + "</ul></div>";
     }
@@ -889,7 +977,7 @@
         var result = quiz.results[score] || { text: "", token: "" };
         if (score > bestScore(quiz.id)) storeSet("botcquiz_best_" + quiz.id, String(score));
         var name = playerName();
-        var content = "<div class=\"quiz-result\"><h2>" + (name ? esc(name) + "님의 " : "") + "점수<br>" + score + "/" + answeredCount + "</h2><div><h3>" + esc(result.text) + "</h3></div>" +
+        var content = "<div class=\"quiz-result\"><h2>" + (name ? esc(name) + "님의 " : "") + "점수<br>" + score + "/" + answeredCount + "</h2><div><h3>" + esc(result.text) + "</h3></div>" + nextStepHtml(quiz, name) +
             "<div class=\"quiz-result__token\"><div class=\"shadow\"></div>" + tokenHtml(result.token, "character", roleName(result.token), "") + "</div>" +
             "<div class=\"quiz-share\">" + button(window.location.hash, "결과 공유하기", true, true) + "<div class=\"quiz-share__done\" aria-live=\"polite\"></div></div>" +
             button("#/" + quiz.id + "/question-1", "다시 도전하기", true, true) + "</div>";
@@ -899,6 +987,80 @@
         };
         var bg = "<div class=\"grimoire-box result-box\"><div class=\"grimoire\" style=\"background:url('" + IMG + "result-" + ((COVERS[quiz.groupKey] || {}).result || quiz.groupKey) + ".webp') center / cover\"></div></div>";
         return playScreen(quiz, [], content, "다른 퀴즈 풀기", bg);
+    }
+
+    // 결과 화면 아래: 카테고리를 다 못 끝냈으면 다음 퀴즈 안내, 다 끝냈으면 기록 보내고 점수표 버튼
+    function nextStepHtml(quiz, name) {
+        var left = groupQuizzes(quiz.groupKey).filter(function (q) { return bestScore(q.id) < 0; });
+        if (left.length) {
+            var next = left[0];
+            return "<div class=\"quiz-next\"><p>다른 사람들은 몇 문제나 풀었을까요?<br><strong>" + esc(left[left.length - 1].difficulty) + "</strong>까지 퀴즈를 마치고 <strong>" +
+                esc(name || "익명") + "</strong>님의 기록을 확인하세요.</p>" +
+                button("#/" + next.id + (next.intro ? "/intro" : "/question-1"), next.difficulty + " 풀러 가기", true, true) + "</div>";
+        }
+        return "<div class=\"quiz-next\" data-group=\"" + esc(quiz.groupKey) + "\"><p>" + esc(quiz.group) + " 퀴즈를 모두 마쳤어요!</p>" +
+            button("#/board/" + quiz.groupKey, "점수표 보기", true, true) + "<div class=\"quiz-next__status\" aria-live=\"polite\">기록을 보내는 중…</div></div>";
+    }
+    function bindNextStep() {
+        var box = root.querySelector(".quiz-next[data-group]");
+        if (!box) return;
+        var status = box.querySelector(".quiz-next__status");
+        askName(status).then(function (name) {
+            if (!name) return "skip";
+            status.textContent = "기록을 보내는 중…";
+            return submitGroup(box.getAttribute("data-group"));
+        }).then(function (me) {
+            if (!status.isConnected) return;
+            status.textContent = me === "skip" ? "점수표에 기록하지 않았어요." : me ? "점수표에 기록했어요 (현재 " + me.rank + "위 / " + me.count + "명)" : "";
+        }).catch(function () {
+            status.textContent = "기록을 보내지 못했어요. [점수표 보기]를 누르면 다시 보냅니다.";
+        });
+    }
+
+    // 점수표 화면 (#/board/<카테고리>)
+    function boardScreen(key) {
+        var label = (groupQuizzes(key)[0] || {}).group || "";
+        return bar("") + "<div class=\"quiz-screen quiz-select quiz-board\">" +
+            "<img class=\"quiz-select__title\" src=\"" + IMG + "quiz_title_text.webp\" width=\"136\" height=\"104\" alt=\"The Quiz\">" +
+            "<h3>" + esc(label) + " 점수표</h3>" +
+            "<p class=\"quiz-board__note\">" + (groupDone(key) ? "내 점수 " + groupScore(key) + "/" + groupTotal(key) + " · 퀴즈마다 최고 점수의 합계" : "이 카테고리의 퀴즈를 모두 마치면 기록이 올라갑니다.") + "</p>" +
+            "<div class=\"quiz-board__list\" aria-live=\"polite\">불러오는 중…</div>" +
+            button("#/select", "퀴즈 고르기로", true, true) + "</div>";
+    }
+    function boardDate(value) {
+        var d = new Date(value);
+        return isNaN(d) ? "" : d.getFullYear() + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2);
+    }
+    function boardRow(row, me) {
+        return "<tr" + (me ? " class=\"is-me\"" : "") + "><td>" + row.rank + "</td><td class=\"name\">" + esc(row.name) + "</td><td>" +
+            row.score + "/" + row.total + "</td><td>" + boardDate(row.updated_at) + "</td></tr>";
+    }
+    function loadBoard(key) {
+        var list = root.querySelector(".quiz-board__list");
+        // 다 끝낸 사람은 먼저 기록을 보내고(점수표가 생기기 전에 끝낸 사람 포함), 그다음 목록·내 순위
+        var mine = !groupDone(key) ? Promise.resolve(null) : askName(list).then(function (name) {
+            list.textContent = "불러오는 중…";
+            return name ? submitGroup(key).catch(function () { return null; }) : null;
+        });
+        mine.then(function (me) {
+            return rpc("wiki_quiz_board", { p_category: key }).then(function (rows) { return [rows, me]; });
+        }).then(function (data) {
+            var rows = data[0];
+            var me = data[1];
+            if (!list.isConnected) return;
+            if (!rows.length) {
+                list.innerHTML = "<p class=\"quiz-board__note\">아직 기록이 없어요.</p>";
+                return;
+            }
+            var html = "<table><thead><tr><th>순위</th><th>이름</th><th>점수</th><th>날짜</th></tr></thead><tbody>";
+            html += rows.map(function (row) { return boardRow(row, me && row.rank === me.rank); }).join("");
+            if (me && me.rank > rows.length) {
+                html += "<tr class=\"gap\"><td colspan=\"4\">…</td></tr>" + boardRow(me, true);
+            }
+            list.innerHTML = html + "</tbody></table>";
+        }).catch(function () {
+            if (list.isConnected) list.innerHTML = "<p class=\"quiz-board__note\">점수표를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>";
+        });
     }
 
     // 결과 공유: 휴대폰은 공유 창, 아니면 복사
@@ -966,6 +1128,8 @@
             return;
         } else if (quiz && quiz.intro && parts[1] === "intro") {
             html = introScreen(quiz);
+        } else if (parts[0] === "board" && COVERS[parts[1]] && order.some(function (id) { return quizzes[id].groupKey === parts[1]; })) {
+            html = boardScreen(parts[1]);
         } else if (hash === "select") {
             html = selectScreen();
         } else if (quiz && /^question-\d+$/.test(parts[1] || "")) {
@@ -1007,6 +1171,8 @@
         bindHome();
         bindShare();
         if (quiz && parts[1] === "intro") bindIntro(quiz);
+        if (quiz && parts[1] === "results") bindNextStep();
+        if (parts[0] === "board") loadBoard(parts[1]);
     }
 
     function bindAnswers() {
