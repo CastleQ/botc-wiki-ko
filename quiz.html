@@ -492,8 +492,18 @@
         return groupQuizzes(key).reduce(function (sum, q) { return sum + q.questions.length; }, 0);
     }
     // 카테고리를 다 끝냈으면 기록 보내기 (사람당 최고 점수 한 줄 — 서버가 처리)
+    // 점수·이름이 지난번 보낸 것과 같으면 다시 쓰지 않고 내 순위만 읽는다 (서버에 내 줄이 없으면 다시 보냄)
     function submitGroup(key) {
-        return rpc("wiki_submit_score", { p_category: key, p_player: playerToken(), p_name: playerName(), p_score: groupScore(key) });
+        var sentKey = "botcquiz_sent_" + key;
+        var now = groupScore(key) + "|" + playerName();
+        function send() {
+            return rpc("wiki_submit_score", { p_category: key, p_player: playerToken(), p_name: playerName(), p_score: groupScore(key) }).then(function (me) {
+                storeSet(sentKey, now);
+                return me;
+            });
+        }
+        if (storeGet(sentKey) !== now) return send();
+        return rpc("wiki_quiz_my_rank", { p_category: key, p_player: playerToken() }).then(function (me) { return me || send(); });
     }
     // 이름이 비어 있으면 먼저 묻는다. 입력하지 않으면(기록 안 함) null → 점수표에 기록하지 않음
     function askName(box) {
