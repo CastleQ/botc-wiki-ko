@@ -142,7 +142,7 @@
 .quiz-card__links a { display: block; width: 100%; color: #7B5D4E; font-family: "Noto Sans KR", sans-serif; font-size: 102%; text-decoration: none; padding: 5px 0; }
 .quiz-card__links a:hover { color: var(--q-primary); }
 
-/* 문제·결과 화면: 왼쪽 그리모어(원본 1024×824를 칸에 맞춰 축소) + 오른쪽 문제 칸 */
+/* 문제·결과 화면: 왼쪽 마도서(원본 1024×824를 칸에 맞춰 축소) + 오른쪽 문제 칸 */
 .quiz-play { display: flex; width: 100%; position: relative; }
 .grimoire-box { flex: 1 1 auto; min-width: 0; position: relative; overflow: hidden; }
 .grimoire {
@@ -271,7 +271,7 @@
     pointer-events: none;
 }
 .seat.is-zoomed .seat-ability { display: block; }
-/* 그리모어 가장자리 토큰은 설명 상자가 밖으로 잘리지 않게 안쪽으로 붙인다 */
+/* 마도서 가장자리 토큰은 설명 상자가 밖으로 잘리지 않게 안쪽으로 붙인다 */
 .seat--edge-left .seat-ability { left: 0; margin-left: -20px; }
 .seat--edge-right .seat-ability { left: auto; right: 0; margin-left: 0; margin-right: -20px; }
 .fabled-row { position: absolute; display: flex; top: 20px; right: 20px; height: 138px; width: 180px; transition: width 0.3s ease; }
@@ -408,7 +408,7 @@
     .quiz-home__inner > img:first-child { width: 170px; }
     .quiz-home__title { width: 120px; }
 }
-/* 좁은 화면: 문제 칸을 그리모어 아래로 */
+/* 좁은 화면: 문제 칸을 마도서 아래로 */
 @media (max-width: 899.98px) {
     .quiz-bar { height: 64px; padding: 0 12px; }
     .quiz-bar__logo img { width: 180px; }
@@ -427,7 +427,7 @@
 </nav>
 <main class="page page--quiz" id="page">
     <div class="quiz" id="quiz"><div class="quiz-loading">불러오는 중…</div></div>
-    <p class="credit" style="padding: 0 16px;">공식 퀴즈 <a href="https://quiz.bloodontheclocktower.com/" target="_blank" rel="noopener">quiz.bloodontheclocktower.com</a>을 한국어로 옮긴 비공식 번역입니다. 예시 플레이어 이름은 한국어 이름으로 바꾸었습니다. '마스터 이야기꾼' 퀴즈는 원본에 없는, 이 도감에서 새로 만든 문제입니다.</p>
+    <p class="credit" style="padding: 0 16px;">공식 퀴즈 <a href="https://quiz.bloodontheclocktower.com/" target="_blank" rel="noopener">quiz.bloodontheclocktower.com</a>을 한국어로 옮긴 비공식 번역입니다. 예시 참가자 이름은 한국어 이름으로 바꾸었습니다. '마스터 이야기꾼' 퀴즈는 원본에 없는, 이 도감에서 새로 만든 문제입니다.</p>
 </main>
 
 <script src="common.js"></script>
@@ -668,7 +668,7 @@
         return html + "</div>";
     }
 
-    // 마도서 가운데 토큰(플레이어 자리에 놓이지 않는 것, 예: 역병 의사로 이야기꾼이 얻은 능력)
+    // 마도서 가운데 토큰(참가자 자리에 놓이지 않는 것, 예: 역병 의사로 이야기꾼이 얻은 능력)
     function centerHtml(center) {
         return (center || []).map(function (c, i) {
             var left = 50 + (i - (center.length - 1) / 2) * 16;
@@ -725,7 +725,7 @@
         return html + "</div>";
     }
 
-    // 그리모어(1024×824)를 칸에 맞춰 축소. 넓은 화면에서는 브라우저 높이(보라 막대 제외)에도 맞춰 스크롤 없이 한 화면에 들어오게 하고, 문제 칸 높이도 같이 맞춘다.
+    // 마도서(1024×824)를 칸에 맞춰 축소. 넓은 화면에서는 브라우저 높이(보라 막대 제외)에도 맞춰 스크롤 없이 한 화면에 들어오게 하고, 문제 칸 높이도 같이 맞춘다.
     function fitGrimoire() {
         var box = root.querySelector(".grimoire-box");
         if (!box) return;
@@ -788,7 +788,7 @@
 
     // 첫 화면
     function homeScreen() {
-        var intro = "<h2>게임 속 여러 모호한 상호작용에서 정답을 찾아보세요.<br>이야기꾼으로서 첫 게임을 진행하기 전에 실력을 시험해 보거나,<br>플레이어로서 게임을 이해하는 데 도움이 될 거예요.</h2>";
+        var intro = "<h2>게임 속 여러 모호한 상호작용에서 정답을 찾아보세요.<br>이야기꾼으로서 첫 게임을 진행하기 전에 실력을 시험해 보거나,<br>참가자로서 게임을 이해하는 데 도움이 될 거예요.</h2>";
         return bar("") + "<div class=\"quiz-screen quiz-home\"><div class=\"quiz-home__inner\">" +
             "<img src=\"" + IMG + "botc_head.webp\" width=\"275\" height=\"295\" alt=\"\">" +
             "<img class=\"quiz-home__title\" src=\"" + IMG + "quiz_title_text.webp\" width=\"167\" height=\"127\" alt=\"The Quiz\">" +

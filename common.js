@@ -345,7 +345,7 @@
     var DOCS = {
         "glossary": { title: "용어집" },
         "storyteller-advice": { title: "이야기꾼 조언" },
-        "player-strategy": { title: "플레이어 전략" },
+        "player-strategy": { title: "참가자 전략" },
         "changelog": { title: "변경 이력", tocLevels: 2 },
         "setup": { title: "게임 준비" },
         "rules": { title: "규칙 설명" },
