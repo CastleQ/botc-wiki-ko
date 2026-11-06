@@ -69,6 +69,9 @@
         <ul class="tiles tiles--editions" id="editions"></ul>
         <h2>유형별 캐릭터</h2>
         <ul class="tiles tiles--types" id="types"></ul>
+        <h2>홈브류 스크립트</h2>
+        <p class="homebrew-note">공식 캐릭터가 아닌, 커뮤니티에서 만든 스크립트의 캐릭터입니다.</p>
+        <ul class="tiles tiles--editions" id="homebrew"></ul>
         <ul class="tiles tiles--types" id="types-special"></ul>
     </div>
     <div id="credit"></div>
@@ -93,6 +96,9 @@
     }
 
     document.getElementById("editions").innerHTML = W.EDITIONS.map(function (edition) {
+        return tile("edition-" + edition.id + ".html", edition.logo, edition.alt, edition.name);
+    }).join("");
+    document.getElementById("homebrew").innerHTML = W.HOMEBREW.map(function (edition) {
         return tile("edition-" + edition.id + ".html", edition.logo, edition.alt, edition.name);
     }).join("");
     // 위키와 같이 첫 줄 주민·외지인·하수인·악마, 둘째 줄 여행자·전설·설화

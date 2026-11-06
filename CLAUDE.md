@@ -15,6 +15,11 @@
 - 페이지 키 읽기는 `W.pageKey(prefix, param)` (고정 주소 → 예전 `?param=` 순). 예전 주소도 계속 열려야 한다.
 - 미리보기 그림 `og/edition-*.jpg`·`og/type-*.jpg`·`og/site.jpg`는 PG+ 판 로고·유형 아이콘·로고를 `convert`로 400×400 양피지색(`#efe6d6`) 바탕에 얹어 한 번 만든 것.
 
+## 홈브류 스크립트 (2026-11-06~)
+- `common.js`의 `HOMEBREW`(지금 `lotr` 반지의 제왕: 반지 원정대). 메인 "홈브류 스크립트" 칸·`edition-<id>.html`(전설 포함, 맨 위 홈브류 안내)·메뉴에 나오고, 공식 유형 페이지(`typeSections`)에는 섞지 않는다. 캐릭터 페이지는 "제작 CastleQ (홈브류)"·"수록 스크립트 (홈브류)"·홈브류 안내 문구(원문 보기 없음).
+- 캐릭터 id에 숫자가 있다(`pippin1`) → 주소·`{c:id}` 정규식은 `[a-z0-9_]`. 데이터·아이콘은 PG+ 쪽(PG+ `tools/wiki/README.md` "홈브류 캐릭터 문서").
+- 새 홈브류 판: `HOMEBREW`에 추가 → `og/edition-<id>.jpg`(대표 아이콘을 400×400 양피지색에 `convert`) → `tools/build-og-images.js`·`tools/build-og.js`.
+
 ## 로컬 확인
 - 페이지가 `/pocket-grimoire/…` 절대 경로를 읽으므로 `<dir>/botc-wiki-ko`에 저장소를 링크하고 `python3 -m http.server`로 띄운 뒤, Playwright `route`에서 `/pocket-grimoire/**`를 `route.fetch({url: 실제 사이트 주소})` → `fulfill`로 대신 응답(`continue`로 주소만 바꾸면 http→https라 거부됨). Playwright는 전역 설치본: `PW=$(npm root -g)/playwright node t.js` + 스크립트에서 `require(process.env.PW)`.
 

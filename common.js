@@ -13,8 +13,21 @@
         { id: "bmr", name: "피로 물든 달", alt: "Bad Moon Rising", logo: BASE + "guide/img/logo_bmr.webp" },
         { id: "snv", name: "화단에 꽃피운 이단", alt: "Sects & Violets", logo: BASE + "guide/img/logo_snv.webp" }
     ];
+    // 홈브류 스크립트(공식 아님). 판 페이지(edition-<id>.html)를 따로 두고, 공식 판·유형 페이지에는 섞지 않는다.
+    // 캐릭터 데이터는 PG+ guide/data(roles.json의 homebrew 값 = 이 id). logo는 대표 캐릭터 아이콘.
+    var HOMEBREW = [
+        { id: "lotr", name: "반지의 제왕: 반지 원정대", alt: "홈브류 · CastleQ", author: "CastleQ", logo: BASE + "img/official/onering1_0.webp" }
+    ];
+    function isHomebrew(editionId) {
+        return HOMEBREW.some(function (item) {
+            return item.id === editionId;
+        });
+    }
     // 판 이름은 PG+ 앱의 정발 이름을 따른다 (translations/messages.ko_KR.yaml editions).
     var EDITION_NAMES = { tb: "점철되는 혼란", bmr: "피로 물든 달", snv: "화단에 꽃피운 이단", exp: "실험" };
+    HOMEBREW.forEach(function (item) {
+        EDITION_NAMES[item.id] = item.name;
+    });
 
     // 공식 위키 메인의 "Characters By Type"
     var TYPES = [
@@ -99,7 +112,9 @@
 
     // 판 페이지: 주민·외지인·하수인·악마 순, 각 유형 안은 정발 순번(catalog 순서 그대로)
     function editionSections(catalog, editionId) {
-        return EDITION_TEAMS.map(function (team) {
+        // 홈브류 판은 전설(fabled)도 판 페이지에 함께 둔다(유형 페이지에는 공식만).
+        var teams = isHomebrew(editionId) ? EDITION_TEAMS.concat(["fabled"]) : EDITION_TEAMS;
+        return teams.map(function (team) {
             return {
                 title: TEAM_NAMES[team],
                 entries: catalog.filter(function (entry) {
@@ -118,7 +133,7 @@
     //  - 설화: 위키 순서 한 묶음
     function typeSections(catalog, team) {
         var members = catalog.filter(function (entry) {
-            return entry.team === team;
+            return entry.team === team && !isHomebrew(entry.edition);
         });
         var sections = [];
 
@@ -210,6 +225,9 @@
     }
 
     function isEditionMember(entry) {
+        if (isHomebrew(entry.edition)) {
+            return true;
+        }
         return EDITION_NAMES[entry.edition] && entry.edition !== "exp" && EDITION_TEAMS.indexOf(entry.team) !== -1;
     }
 
@@ -309,7 +327,7 @@
             .replace(/\[([^\]]+)\]\(((?:wiki:|https?:\/\/)[^)\s]+)\)/g, function (all, label, target) {
                 return linkHtml(label, target);
             })
-            .replace(/\{c:([a-z_]+)\}/g, function (all, roleId) {
+            .replace(/\{c:([a-z0-9_]+)\}/g, function (all, roleId) {
                 var entry = byId[roleId];
                 if (!entry) {
                     return esc(roleId);
@@ -368,6 +386,8 @@
     window.WikiKo = {
         BASE: BASE,
         EDITIONS: EDITIONS,
+        HOMEBREW: HOMEBREW,
+        isHomebrew: isHomebrew,
         EDITION_NAMES: EDITION_NAMES,
         TYPES: TYPES,
         TYPE_PAGES: TYPE_PAGES,
@@ -410,7 +430,9 @@
                 return [edition.name, "edition-" + edition.id + ".html"];
             }).concat(["traveller", "fabled", "loric"].map(function (team) {
                 return [TEAM_NAMES[team], "type-" + team + ".html"];
-            })).concat([["실험 캐릭터", "type-experimental.html"]]) },
+            })).concat([["실험 캐릭터", "type-experimental.html"]]).concat(HOMEBREW.map(function (item) {
+                return [item.name + " (홈브류)", "edition-" + item.id + ".html"];
+            })) },
             { title: "둘러보기", items: ["recent-changes", "random", ["오역 제보 및 기타문의", "https://open.kakao.com/o/smyEIE4"]] }
         ];
         var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;

@@ -89,7 +89,7 @@ catalog.forEach((entry) => {
         description: (roles[entry.id] || {}).ability || "", image: entry.id + ".jpg" });
 });
 const editionTemplate = readTemplate("edition.html");
-W.EDITIONS.forEach((edition) => {
+W.EDITIONS.concat(W.HOMEBREW).forEach((edition) => {
     pages.push({ file: "edition-" + edition.id + ".html", template: editionTemplate, name: edition.name,
         description: edition.name + "(" + edition.alt + ") 캐릭터 목록과 소개", image: "edition-" + edition.id + ".jpg" });
 });
