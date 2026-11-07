@@ -78,9 +78,6 @@
 
         document.title = edition.name + " — 시계탑에 흐른 피(시계피) wiki 페이지 한글";
         html += "<h1 class=\"title\">" + esc(edition.name) + "</h1>";
-        if (W.isHomebrew(edition.id)) {
-            html += "<p class=\"homebrew-note\"><b>홈브류 스크립트</b> — " + esc(edition.author) + "가 만든 커뮤니티 스크립트입니다. 공식 캐릭터가 아닙니다.</p>";
-        }
         html += "<div class=\"edition-layout\">";
 
         // 오른쪽 정보 상자: 판 로고 + 유형별 캐릭터 (이름을 세로로)
