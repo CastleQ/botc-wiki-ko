@@ -16,7 +16,8 @@
     // 홈브류 스크립트(공식 아님). 판 페이지(edition-<id>.html)를 따로 두고, 공식 판·유형 페이지에는 섞지 않는다.
     // 캐릭터 데이터는 PG+ guide/data(roles.json의 homebrew 값 = 이 id). logo는 대표 캐릭터 아이콘.
     var HOMEBREW = [
-        { id: "lotr", name: "반지의 제왕: 반지 원정대", alt: "홈브류 · CastleQ", author: "CastleQ", logo: BASE + "img/official/onering1_0.webp" }
+        { id: "lotr", name: "반지의 제왕: 반지 원정대", alt: "홈브류 · CastleQ", author: "CastleQ", logo: BASE + "img/official/onering1_0.webp" },
+        { id: "fallofrome", name: "로마의 몰락", alt: "홈브류 · Alex S", author: "Alex S", logo: BASE + "guide/img/logo_fallofrome.webp" }
     ];
     function isHomebrew(editionId) {
         return HOMEBREW.some(function (item) {
@@ -112,8 +113,8 @@
 
     // 판 페이지: 주민·외지인·하수인·악마 순, 각 유형 안은 정발 순번(catalog 순서 그대로)
     function editionSections(catalog, editionId) {
-        // 홈브류 판은 전설(fabled)도 판 페이지에 함께 둔다(유형 페이지에는 공식만).
-        var teams = isHomebrew(editionId) ? EDITION_TEAMS.concat(["fabled"]) : EDITION_TEAMS;
+        // 홈브류 판은 여행자·전설도 판 페이지에 함께 둔다(유형 페이지에는 공식만).
+        var teams = isHomebrew(editionId) ? EDITION_TEAMS.concat(["traveller", "fabled"]) : EDITION_TEAMS;
         return teams.map(function (team) {
             return {
                 title: TEAM_NAMES[team],
