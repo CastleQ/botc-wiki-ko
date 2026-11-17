@@ -16,9 +16,11 @@
 - 미리보기 그림 `og/edition-*.jpg`·`og/type-*.jpg`·`og/site.jpg`는 PG+ 판 로고·유형 아이콘·로고를 `convert`로 400×400 양피지색(`#efe6d6`) 바탕에 얹어 한 번 만든 것.
 
 ## 홈브류 스크립트 (2026-11-06~)
-- `common.js`의 `HOMEBREW`(지금 `lotr` 반지의 제왕: 반지 원정대). 메인 "홈브류 스크립트" 칸(유형별 캐릭터 아래)·`edition-<id>.html`(전설 포함)·메뉴에 나오고, 공식 유형 페이지(`typeSections`)에는 섞지 않는다. 캐릭터 페이지는 "제작 CastleQ (홈브류)"·"수록 스크립트 (홈브류)"·아래 문구 "CastleQ가 만든 홈브류 스크립트 「…」의 캐릭터 문서입니다."(원문 보기 없음). "공식 캐릭터가 아닙니다" 같은 안내는 넣지 않는다(CastleQ 2026-11-07).
+- `common.js`의 `HOMEBREW`(지금 `lotr` 반지의 제왕: 반지 원정대, `fallofrome` 로마의 몰락(제작 Alex S, 2026-11-17)). 메인 "홈브류 스크립트" 칸(유형별 캐릭터 아래)·`edition-<id>.html`(여행자·전설 포함 — 홈브류 여행자는 유형 페이지에 안 나와 여기 없으면 고아가 됨)·메뉴에 나오고, 공식 유형 페이지(`typeSections`)에는 섞지 않는다. 캐릭터 페이지는 "제작 CastleQ (홈브류)"·"수록 스크립트 (홈브류)"·아래 문구 "CastleQ가 만든 홈브류 스크립트 「…」의 캐릭터 문서입니다."(원문 보기 없음). "공식 캐릭터가 아닙니다" 같은 안내는 넣지 않는다(CastleQ 2026-11-07).
 - 캐릭터 id에 숫자가 있다(`pippin1`) → 주소·`{c:id}` 정규식은 `[a-z0-9_]`. 데이터·아이콘은 PG+ 쪽(PG+ `tools/wiki/README.md` "홈브류 캐릭터 문서").
-- 새 홈브류 판: `HOMEBREW`에 추가 → `og/edition-<id>.jpg`(대표 아이콘을 400×400 양피지색에 `convert`) → `tools/build-og-images.js`·`tools/build-og.js`.
+- 새 홈브류 판: `HOMEBREW`에 추가 → `og/edition-<id>.jpg`(대표 아이콘이나 PG+ `guide/img/logo_<id>.webp`를 400×400 양피지색에 `convert`) → `tools/build-og-images.js`·`tools/build-og.js`. 판 소개 글은 PG+ `pages/<id>.json`(`"homebrew"` 칸 → TPI 출처 문구 안 붙음).
+- 남의 홈브류 문서(연감 md 등)는 PG+ 시트 JSON이 정본: 이름·용어·능력은 시트에 맞추고, 다른 캐릭터 이름은 `{c:id}`(대제사장처럼 이름이 겹치면 제외), 예시 사람 이름은 공식 예시 이름 10명(에이미·마리아나·사라·브리아나·미아/더그·압달라·에빈·줄리언·라클런)을 성별 맞춰 쓰고 받침 조사(괄호 뒤 포함)를 고친다.
+- 클라우드 세션에서 `git push origin HEAD:main`은 자동 안전 장치에 막힐 수 있다 → PR을 초안 해제 후 GitHub MCP로 합치기(배포 허가가 있을 때만).
 
 ## 로컬 확인
 - 페이지가 `/pocket-grimoire/…` 절대 경로를 읽으므로 `<dir>/botc-wiki-ko`에 저장소를 링크하고 `python3 -m http.server`로 띄운 뒤, Playwright `route`에서 `/pocket-grimoire/**`를 `route.fetch({url: 실제 사이트 주소})` → `fulfill`로 대신 응답(`continue`로 주소만 바꾸면 http→https라 거부됨). Playwright는 전역 설치본: `PW=$(npm root -g)/playwright node t.js` + 스크립트에서 `require(process.env.PW)`.
