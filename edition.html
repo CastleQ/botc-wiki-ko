@@ -109,7 +109,7 @@
         }).join("");
         html += "</div></div>";
 
-        if (story) {
+        if (story && !W.isHomebrew(edition.id)) {
             html += "<div class=\"credit\">이 페이지의 줄거리·게임 방식은 Blood on the Clocktower 공식 위키 문서(판 " + esc(story.source.oldid) +
                 ")를 제작사 TPI의 Community Created Content 정책에 의거하여 한국어로 번역한 비공식 번역입니다. " +
                 "<a href=\"https://wiki.bloodontheclocktower.com/" + esc(encodeURIComponent(story.source.page)) + "\" target=\"_blank\" rel=\"noopener\">원문(영어) 보기</a></div>";
