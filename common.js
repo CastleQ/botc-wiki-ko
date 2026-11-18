@@ -431,9 +431,10 @@
                 return [edition.name, "edition-" + edition.id + ".html"];
             }).concat(["traveller", "fabled", "loric"].map(function (team) {
                 return [TEAM_NAMES[team], "type-" + team + ".html"];
-            })).concat([["실험 캐릭터", "type-experimental.html"]]).concat(HOMEBREW.map(function (item) {
-                return [item.name + " (홈브류)", "edition-" + item.id + ".html"];
-            })) },
+            })).concat([["실험 캐릭터", "type-experimental.html"]]) },
+            { title: "홈브류 캐릭터", items: HOMEBREW.map(function (item) {
+                return [item.name, "edition-" + item.id + ".html"];
+            }) },
             { title: "둘러보기", items: ["recent-changes", "random", ["오역 제보 및 기타문의", "https://open.kakao.com/o/smyEIE4"]] }
         ];
         var here = window.location.pathname.replace(/^.*\//, "") + window.location.search;
