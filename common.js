@@ -17,7 +17,8 @@
     // 캐릭터 데이터는 PG+ guide/data(roles.json의 homebrew 값 = 이 id). logo는 대표 캐릭터 아이콘.
     var HOMEBREW = [
         { id: "lotr", name: "반지의 제왕: 반지 원정대", alt: "홈브류 · CastleQ", author: "CastleQ", logo: BASE + "img/official/onering1_0.webp" },
-        { id: "fallofrome", name: "로마의 몰락", alt: "홈브류 · Alex S", author: "Alex S", logo: BASE + "guide/img/logo_fallofrome.webp" }
+        { id: "fallofrome", name: "로마의 몰락", alt: "홈브류 · Alex S", author: "Alex S", logo: BASE + "guide/img/logo_fallofrome.webp" },
+        { id: "jeomsoi", name: "점소이! 여기 술 한잔!", alt: "홈브류 · Zonas_Liu", author: "Zonas_Liu", logo: BASE + "guide/img/logo_jeomsoi.webp" }
     ];
     function isHomebrew(editionId) {
         return HOMEBREW.some(function (item) {
