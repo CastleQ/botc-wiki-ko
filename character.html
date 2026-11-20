@@ -209,7 +209,7 @@ audio { width: 90%; margin: 0.5em 0 10px; }
         html += "<span class=\"details-label\">정보</span>";
         html += "<table><tr><td>유형</td><td>" + esc(W.TEAM_NAMES[self.team] || "") + "</td></tr>";
         html += homebrew
-            ? "<tr><td>제작</td><td>" + esc(edition.author) + " (홈브류)</td></tr></table>"
+            ? "<tr><td>제작</td><td>" + esc(edition.author) + "</td></tr></table>"
             : "<tr><td>아티스트</td><td>" + esc(guide.artist || "") + "</td></tr></table>";
         if (self.flavor) {
             html += "<p class=\"flavour\">\"" + esc(self.flavor) + "\"</p>";
