@@ -27,6 +27,7 @@
 
 ## 이야기꾼 퀴즈 (quiz.html)
 - 번역 원고·원본 데이터·만드는 스크립트는 `CastleQ/pgplus-notes`의 `tools/quiz-ko/`(비공개). 번역 수정: `ko/<퀴즈>.json` 고친 뒤 `node build.js` → `quiz/data.json`.
+- 알림 토큰 이름은 `build.js`가 PG+ `ko_KR.json`에서 가져온다 → PG+ 토큰 이름이 바뀌면 `node build.js <PG+ 폴더> <도감 폴더>`로 다시 만든다(도감 자체 퀴즈 원고 `custom/`의 토큰 글자는 손으로).
 - 원본 퀴즈는 React 앱이라 curl로는 빈 껍데기. 문제는 Google 시트에서 오며, 원본 페이지를 브라우저로 열면 `localStorage.QUIZ_DATA`에 정리된 데이터가 남는다(코드 속 API 키로 직접 부르는 건 권한 검사에서 막힘).
 - 예시 이름은 `names.js`가 문제마다 정한다(자주 나오는 21명 고정 짝, 드문 이름은 그 문제에서 안 쓰인 이름). 모든 이름 2번 이상은 build.js가 검사.
 - 점검: pgplus-notes `tools/quiz-ko/check.js` (206문제를 브라우저로 돌며 좌석 수·보기 수·정답 표시·만점 결과 확인, 실패 0이어야 함).
